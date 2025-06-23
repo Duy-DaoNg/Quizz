@@ -939,7 +939,7 @@ app.use((req, res) => {
 // ========================================
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
+    console.log(`🚀 Server running at ${process.env.BASE_URL}:${PORT}`);
     console.log(`🔌 Socket.IO server ready for real-time tests`);
     console.log(`🌍 i18n support enabled (Vietnamese/English)`);
     console.log(`\n👤 Demo credentials:`);

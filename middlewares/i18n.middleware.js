@@ -227,7 +227,7 @@ const errorHandler = (err, req, res, next) => {
     }
     
     // For web requests, render error page
-    res.status(statusCode).render('error', {
+    res.status(statusCode).render('error/500', {
         title: req.t('common:error'),
         message: errorMessage,
         statusCode: statusCode,
