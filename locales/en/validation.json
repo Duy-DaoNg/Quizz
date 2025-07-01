@@ -77,5 +77,6 @@
   "feature_disabled": "This feature is currently disabled",
   "invalid_state": "Invalid state for this operation",
   "concurrent_modification": "Resource was modified by another user. Please refresh and try again.",
-  "dependency_error": "Cannot complete operation due to dependencies"
+  "dependency_error": "Cannot complete operation due to dependencies",
+  "name_validate": "Name must be in the format VNxxxx (e.g., VN1234)"
 }

@@ -77,5 +77,6 @@
   "feature_disabled": "Tính năng này hiện đang bị vô hiệu hóa",
   "invalid_state": "Trạng thái không hợp lệ cho thao tác này",
   "concurrent_modification": "Tài nguyên đã bị thay đổi bởi người dùng khác. Vui lòng làm mới và thử lại.",
-  "dependency_error": "Không thể hoàn thành thao tác do các phụ thuộc"
+  "dependency_error": "Không thể hoàn thành thao tác do các phụ thuộc",
+  "name_validate": "Tên phải có định dạng VNxxxx (ví dụ: VN1234)"
 }

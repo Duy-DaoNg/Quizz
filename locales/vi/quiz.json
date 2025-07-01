@@ -206,5 +206,12 @@
   "draft_restored": "Bản nháp đã được khôi phục thành công!",
   
   "_comment_misc": "=== MISCELLANEOUS ===",
-  "copy": "Sao chép"
+  "copy": "Sao chép",
+  "duplicate_quiz_title": "Tạo bản sao bài kiểm tra?",
+  "duplicate_quiz_text": "Hệ thống sẽ tạo một bản sao y hệt bài kiểm tra này với mã mới.",
+  "yes_duplicate": "Đồng ý sao chép",
+  "duplicating_quiz": "Đang tạo bản sao...",
+  "quiz_duplicated": "Đã sao chép bài kiểm tra!",
+  "quiz_duplicated_text": "Bản sao bài kiểm tra đã được tạo thành công.",
+  "failed_duplicate_quiz": "Không thể sao chép bài kiểm tra. Vui lòng thử lại."
 }

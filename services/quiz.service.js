@@ -4,6 +4,7 @@ const path = require('path');
 
 class QuizService {
     async createQuiz(quizData, files, t = null) {
+        console.log('Creating quiz with data:', quizData);
         try {
             // Default translation function
             const translate = t || ((key, options = {}) => {
@@ -29,32 +30,37 @@ class QuizService {
             
             // Process images and save paths
             const processedQuestions = questionsData.map(question => {
-                const imageKey = `questionImage_${question.number}`;
-                let imageFile = null;
-                
-                // Find the correct image file
-                if (files) {
-                    if (Array.isArray(files)) {
-                        imageFile = files.find(f => f.fieldname === imageKey);
-                    } else if (typeof files === 'object') {
-                        imageFile = Object.values(files).flat().find(f => f.fieldname === imageKey);
-                    }
-                }
-
                 let imagePath = null;
-                if (imageFile && imageFile.path) {
-                    try {
-                        const pathParts = imageFile.path.split('public');
-                        if (pathParts.length > 1) {
-                            imagePath = '/' + pathParts[1].replace(/\\/g, '/');
-                            if (imagePath.startsWith('//')) {
-                                imagePath = imagePath.substring(1);
-                            }
+                if (!question.imagePath || question.imagePath.trim().length < 1) {
+                    const imageKey = `questionImage_${question.number}`;
+                    let imageFile = null;
+                    
+                    // Find the correct image file
+                    if (files) {
+                        if (Array.isArray(files)) {
+                            imageFile = files.find(f => f.fieldname === imageKey);
+                        } else if (typeof files === 'object') {
+                            imageFile = Object.values(files).flat().find(f => f.fieldname === imageKey);
                         }
-                    } catch (error) {
-                        console.error('Error processing image path:', error);
-                        imagePath = null;
                     }
+
+                    
+                    if (imageFile && imageFile.path) {
+                        try {
+                            const pathParts = imageFile.path.split('public');
+                            if (pathParts.length > 1) {
+                                imagePath = '/' + pathParts[1].replace(/\\/g, '/');
+                                if (imagePath.startsWith('//')) {
+                                    imagePath = imagePath.substring(1);
+                                }
+                            }
+                        } catch (error) {
+                            imagePath = null;
+                        }
+                    }
+                } else {
+                    console.log('Using provided image path:', question.imagePath);
+                    imagePath = question.imagePath;
                 }
                 
                 // Process options - ensure they have the correct format

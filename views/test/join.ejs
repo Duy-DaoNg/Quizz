@@ -410,7 +410,7 @@
                                id="participantName" 
                                name="participantName"
                                placeholder="<%= t('test:enter_name') %>" 
-                               maxlength="50"
+                               maxlength="6"
                                required>
                         <label for="participantName"><%= t('test:enter_name') %></label>
                     </div>
@@ -464,7 +464,8 @@
             testCancelled: '<%= t("test:test_cancelled") || "Test Cancelled" %>',
             testCancelledMessage: '<%= t("test:test_cancelled_admin") || "This test session has been cancelled by the administrator." %>',
             tryAgain: '<%= t("common:try_again") || "Try Again" %>',
-            
+            invalidNameFormat: '<%= t("validation:name_validate") || "Invalid name format. Please use VNxxxx (e.g., VN1234)." %>',
+
             // Character counter
             characters: '<%= t("test:characters") || "characters" %>',
             
@@ -496,11 +497,12 @@
                 
                 const participantName = nameInput.value.trim();
                 
-                if (participantName.length < 2) {
+                const vnFormatRegex = /^VN\d{4}$/;
+                if (!vnFormatRegex.test(participantName)) {
                     Swal.fire({
                         icon: 'error',
                         title: window.translations.invalidName,
-                        text: window.translations.nameRequired,
+                        text: window.translations.invalidNameFormat,
                         confirmButtonColor: '#667eea'
                     });
                     return;
@@ -618,7 +620,7 @@
             // Handle character counter and other existing functionality...
             nameInput.addEventListener('input', function() {
                 const currentLength = this.value.length;
-                const maxLength = 50;
+                const maxLength = 6;
                 
                 const existingCounter = document.getElementById('nameCounter');
                 if (existingCounter) {

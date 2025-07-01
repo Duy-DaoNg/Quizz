@@ -321,12 +321,16 @@
                                 </div>
                                 <div class="quick-actions">
                                     <a href="/quizzes/<%= quiz._id %>/preview" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye me-1"></i>
+                                        <i class="fas fa-eye me-1"></i> <br>
                                         <%= t('quiz:preview') %>
                                     </a>
                                     <a href="/quizzes/<%= quiz._id %>/edit" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-edit me-1"></i>
+                                        <i class="fas fa-edit me-1"></i> <br>
                                         <%= t('common:edit') %>
+                                    </a>
+                                    <a href="#" onclick="duplicateQuiz('<%= quiz._id %>')" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-clone me-1"></i> <br>
+                                        <%= t('common:duplicate') %>
                                     </a>
                                 </div>
                             </div>
@@ -624,7 +628,14 @@
             joinAnytimeScheduled: '<%= t("test:join_anytime_scheduled") %>',
             startTestNow: '<%= t("test:start_test_now") %>',
             close: '<%= t("common:close") %>',
-            joinLinkCopied: '<%= t("test:join_link_copied") %>'
+            joinLinkCopied: '<%= t("test:join_link_copied") %>',
+            duplicateQuizTitle: '<%= t("quiz:duplicate_quiz_title") %>',
+            duplicateQuizText: '<%= t("quiz:duplicate_quiz_text") %>',
+            yesDuplicateBtn: '<%= t("quiz:yes_duplicate") %>',
+            duplicatingQuiz: '<%= t("quiz:duplicating_quiz") %>',
+            quizDuplicated: '<%= t("quiz:quiz_duplicated") %>',
+            quizDuplicatedText: '<%= t("quiz:quiz_duplicated_text") %>',
+            failedDuplicateQuiz: '<%= t("quiz:failed_duplicate_quiz") %>',
         };
     </script>
     
@@ -773,6 +784,75 @@
                 });
             }
         };
+        window.duplicateQuiz = async function(quizId) {
+            try {
+                const result = await Swal.fire({
+                    title: window.translations.duplicateQuizTitle || 'Duplicate Quiz?',
+                    text: window.translations.duplicateQuizText || 'This will create an exact copy of the quiz with a new number.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#667eea',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: window.translations.yesDuplicateBtn || 'Yes, Duplicate',
+                    cancelButtonText: window.translations.cancelBtn,
+                    customClass: {
+                        popup: 'swal-modern',
+                        confirmButton: 'swal-confirm-modern',
+                        cancelButton: 'swal-cancel-modern'
+                    }
+                });
+
+                if (!result.isConfirmed) return;
+
+                Swal.fire({
+                    title: window.translations.duplicatingQuiz || 'Duplicating Quiz...',
+                    text: window.translations.pleaseWait || 'Please wait...',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: 'swal-modern'
+                    }
+                });
+
+                const response = await fetch(`/quizzes/${quizId}/duplicate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('API error');
+
+                Swal.fire({
+                    title: window.translations.quizDuplicated || 'Quiz Duplicated!',
+                    text: window.translations.quizDuplicatedText || 'The quiz copy has been created successfully.',
+                    icon: 'success',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: 'swal-modern'
+                    }
+                });
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                console.error('Duplicate quiz error:', error);
+                Swal.fire({
+                    title: window.translations.errorTitle || 'Error!',
+                    text: window.translations.failedDuplicateQuiz || 'Failed to duplicate the quiz. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#667eea',
+                    customClass: {
+                        popup: 'swal-modern'
+                    }
+                });
+            }
+        }
 
         // Dropdown fix for room selection
         document.addEventListener('DOMContentLoaded', function() {

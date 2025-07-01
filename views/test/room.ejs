@@ -810,7 +810,8 @@
         });
 
         function initializeSocket() {
-            socket = io('http://112.213.87.91:3000',{
+            // socket = io('http://112.213.87.91:3000',{
+            socket = io('http://localhost:3000',{
                 transports: ['websocket', 'polling'],
                 timeout: 20000,
                 reconnection: true,

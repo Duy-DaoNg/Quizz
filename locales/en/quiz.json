@@ -207,5 +207,12 @@
   "draft_restored": "Draft restored successfully!",
   
   "_comment_misc": "=== MISCELLANEOUS ===",
-  "copy": "Copy"
+  "copy": "Copy",
+  "duplicate_quiz_title": "Duplicate Quiz?",
+  "duplicate_quiz_text": "This will create an exact copy of the quiz with a new number.",
+  "yes_duplicate": "Yes, Duplicate",
+  "duplicating_quiz": "Duplicating Quiz...",
+  "quiz_duplicated": "Quiz Duplicated!",
+  "quiz_duplicated_text": "The quiz copy has been created successfully.",
+  "failed_duplicate_quiz": "Failed to duplicate the quiz. Please try again."
 }

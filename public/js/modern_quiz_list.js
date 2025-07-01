@@ -374,39 +374,47 @@ async function duplicateQuiz(quizId) {
             }
         });
 
-        if (result.isConfirmed) {
-            // Show loading
-            Swal.fire({
-                title: 'Duplicating Quiz...',
-                text: 'Creating a copy of your quiz with a new quiz number.',
-                icon: 'info',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                customClass: {
-                    popup: 'swal-modern'
-                }
-            });
+        if (!result.isConfirmed) return;
 
-            // Simulate API call (implement actual duplication)
-            await new Promise(resolve => setTimeout(resolve, 2000));
+        // Show loading
+        Swal.fire({
+            title: 'Duplicating Quiz...',
+            text: 'Creating a copy of your quiz with a new quiz number.',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'swal-modern'
+            }
+        });
 
-            Swal.fire({
-                title: 'Quiz Duplicated!',
-                text: 'The quiz copy has been created successfully with a new quiz number.',
-                icon: 'success',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: false,
-                customClass: {
-                    popup: 'swal-modern'
-                }
-            });
+        // Gửi POST tới API: /quiz/:id/duplicate
+        const response = await fetch(`/quizzes/${quizId}/duplicate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-            // Refresh page to show new quiz
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000);
-        }
+        if (!response.ok) throw new Error('API error');
+
+        // Thành công
+        Swal.fire({
+            title: 'Quiz Duplicated!',
+            text: 'The quiz copy has been created successfully with a new quiz number.',
+            icon: 'success',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'swal-modern'
+            }
+        });
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+
     } catch (error) {
         console.error('Duplicate quiz error:', error);
         Swal.fire({
@@ -420,6 +428,7 @@ async function duplicateQuiz(quizId) {
         });
     }
 }
+
 
 /**
  * Share quiz functionality

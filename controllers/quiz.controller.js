@@ -1,5 +1,7 @@
 const QuizService = require('../services/quiz.service');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
 // Helper function to determine quiz status
 function getQuizStatus(quiz) {
@@ -40,46 +42,66 @@ function estimateQuizDuration(questions) {
 // Helper function to migrate old quiz data to new format
 function migrateQuizData(quiz) {
     if (!quiz.questions) return quiz;
-    
-    // Migrate questions to new format if needed
+    const projectRoot = process.cwd(); // thường là nơi chứa server.js/app.js
+    const publicDir = path.join(projectRoot, 'public');
+    const imageDir = path.join(publicDir, 'uploads', 'quiz_images');
+
     quiz.questions = quiz.questions.map(question => {
-        // If question has old 'type' field, remove it (we only support single choice now)
+        // 1. Remove unsupported field
         if (question.type) {
             delete question.type;
         }
-        
-        // Ensure answerTime exists
+
+        // 2. Ensure answerTime exists
         if (!question.answerTime) {
-            question.answerTime = 30; // Default 30 seconds
+            question.answerTime = 30;
         }
-        
-        // Ensure options are in new format
+
+        // 3. Convert options format
         if (question.options && question.options.length > 0) {
-            // If options are in old format, convert them
             if (typeof question.options[0] === 'string') {
                 question.options = question.options.map((text, index) => ({
-                    letter: String.fromCharCode(65 + index), // A, B, C, D, etc.
+                    letter: String.fromCharCode(65 + index),
                     text: text
                 }));
             }
         } else {
-            // Default to 2 empty options
             question.options = [
                 { letter: 'A', text: '' },
                 { letter: 'B', text: '' }
             ];
         }
-        
-        // Ensure correctAnswer is a single letter (not array)
+
+        // 4. Ensure correctAnswer is a single letter
         if (Array.isArray(question.correctAnswer)) {
             question.correctAnswer = question.correctAnswer[0] || 'A';
         } else if (!question.correctAnswer) {
             question.correctAnswer = 'A';
         }
-        
+
+        // 5. Clone image file if exists
+        if (question.image && typeof question.image === 'string') {
+            try {
+                const oldImagePath = path.join(publicDir, question.image.replace(/^\/+/, ''));
+                const ext = path.extname(oldImagePath);
+                const newFileName = `${Date.now()}_${Math.round(Math.random() * 1e9)}${ext}`;
+                const newRelativePath = `/uploads/quiz_images/${newFileName}`;
+                const newImagePath = path.join(imageDir, newFileName);
+
+                if (fs.existsSync(oldImagePath)) {
+                    fs.copyFileSync(oldImagePath, newImagePath);
+                    question.image = newRelativePath;
+                } else {
+                    console.warn(`Image not found: ${oldImagePath}`);
+                }
+            } catch (err) {
+                console.error('Error copying image:', err);
+            }
+        }
+
         return question;
     });
-    
+
     return quiz;
 }
 
@@ -140,7 +162,8 @@ class QuizController {
             }
 
             // Migrate data if needed
-            quiz = migrateQuizData(quiz);
+            // quiz = migrateQuizData(quiz);
+            quiz = quiz;
             res.json(quiz);
         } catch (error) {
             res.status(404).json({ 
@@ -241,7 +264,7 @@ class QuizController {
             }
 
             // Migrate data if needed for backward compatibility
-            quiz = migrateQuizData(quiz);
+            // quiz = migrateQuizData(quiz);
             
             const roomInfo = req.session?.selectedRoom;
             
@@ -300,7 +323,8 @@ class QuizController {
             // Add additional stats and formatting with quiz number support
             const enhancedQuizzes = paginatedQuizzes.map(quiz => {
                 // Migrate quiz data if needed
-                const migratedQuiz = migrateQuizData(quiz);
+                // const migratedQuiz = migrateQuizData(quiz);
+                const migratedQuiz = quiz;
                 
                 // Calculate completion percentage
                 const completionRate = quiz.totalCount > 0 ? 
@@ -424,7 +448,7 @@ class QuizController {
             }
 
             // Migrate data if needed
-            quiz = migrateQuizData(quiz);
+            // quiz = migrateQuizData(quiz);
 
             res.render('quiz/preview', {
                 title: req.t('quiz:preview_quiz') + ` #${quiz.number} - ` + getRoomName(quiz.roomCode),
@@ -495,7 +519,8 @@ class QuizController {
                         { letter: 'A', text: '' },
                         { letter: 'B', text: '' }
                     ],
-                    correctAnswer: q.correctAnswer || 'A'
+                    correctAnswer: q.correctAnswer || 'A',
+                    imagePath: q.image || null,
                 })))
             };
             
