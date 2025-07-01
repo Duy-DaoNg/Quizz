@@ -4,7 +4,6 @@ const path = require('path');
 
 class QuizService {
     async createQuiz(quizData, files, t = null) {
-        console.log('Creating quiz with data:', quizData);
         try {
             // Default translation function
             const translate = t || ((key, options = {}) => {
