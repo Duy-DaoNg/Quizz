@@ -365,7 +365,8 @@ testSchema.methods.getIncompleteParticipants = function() {
 // Method to get leaderboard - UPDATED for offline mode
 testSchema.methods.getLeaderboard = function(limit = 20) {
     const participants = this.mode === 'offline' ? 
-        this.participants.filter(p => p.isActive) : 
+	this.participants :
+        // this.participants.filter(p => p.isActive) : 
         this.getActiveParticipants();
         
     return participants

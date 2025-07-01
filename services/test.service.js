@@ -1246,7 +1246,8 @@ class TestService {
             }
             
             // Calculate final results
-            const activeParticipants = test.getActiveParticipants();
+            // const activeParticipants = test.getActiveParticipants();
+	    const activeParticipants = test.participants;
             const finalResults = activeParticipants
                 .sort((a, b) => b.score - a.score)
                 .map((participant, index) => ({
