@@ -128,7 +128,20 @@
                                 <%= t('quiz:management') %>
                                 <% if (typeof roomInfo !== 'undefined' && roomInfo) { %>
                                 <small class="text-white-50 d-block mt-2" style="font-size: 1.2rem; font-weight: 500;">
-                                    <i class="fas <%= roomInfo.roomCode === 'hrm' ? 'fa-users' : roomInfo.roomCode === 'hse' ? 'fa-shield-alt' : roomInfo.roomCode === 'qasx' ? 'fa-clipboard-check' : roomInfo.roomCode === 'sale-marketing' ? 'fa-bullhorn' : 'fa-crown' %> me-2"></i>
+                                    <i class="fas 
+                                        <%= roomInfo.roomCode === 'hrm' ? 'fa-users' :
+                                            roomInfo.roomCode === 'hse' ? 'fa-shield-alt' :
+                                            roomInfo.roomCode === 'qaqs' ? 'fa-clipboard-check' :
+                                            roomInfo.roomCode === 'sm' ? 'fa-crown' :
+                                            roomInfo.roomCode === 'gm' ? 'fa-briefcase' :
+                                            roomInfo.roomCode === 'fol' ? 'fa-industry' :
+                                            roomInfo.roomCode === 'eol' ? 'fa-cogs' :
+                                            roomInfo.roomCode === 'it' ? 'fa-laptop-code' :
+                                            roomInfo.roomCode === 'mkt' ? 'fa-bullhorn' :
+                                            roomInfo.roomCode === 'eng' ? 'fa-tools' :
+                                            roomInfo.roomCode === 'wh' ? 'fa-warehouse' :
+                                            'fa-question-circle' %> me-2">
+                                    </i>
                                     <%= roomInfo.name %> <%= t('quiz:department') %>
                                 </small>
                                 <% } %>
@@ -267,7 +280,20 @@
                                 <!-- Department Badge -->
                                 <% if (quiz.roomCode) { %>
                                 <span class="badge badge-language" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
-                                    <i class="fas <%= quiz.roomCode === 'hrm' ? 'fa-users' : quiz.roomCode === 'hse' ? 'fa-shield-alt' : quiz.roomCode === 'qasx' ? 'fa-clipboard-check' : quiz.roomCode === 'sale-marketing' ? 'fa-bullhorn' : 'fa-crown' %> me-1"></i>
+                                    <i class="fas 
+                                        <%= roomInfo.roomCode === 'hrm' ? 'fa-users' :
+                                            roomInfo.roomCode === 'hse' ? 'fa-shield-alt' :
+                                            roomInfo.roomCode === 'qaqs' ? 'fa-clipboard-check' :
+                                            roomInfo.roomCode === 'sm' ? 'fa-crown' :
+                                            roomInfo.roomCode === 'gm' ? 'fa-briefcase' :
+                                            roomInfo.roomCode === 'fol' ? 'fa-industry' :
+                                            roomInfo.roomCode === 'eol' ? 'fa-cogs' :
+                                            roomInfo.roomCode === 'it' ? 'fa-laptop-code' :
+                                            roomInfo.roomCode === 'mkt' ? 'fa-bullhorn' :
+                                            roomInfo.roomCode === 'eng' ? 'fa-tools' :
+                                            roomInfo.roomCode === 'wh' ? 'fa-warehouse' :
+                                            'fa-question-circle' %> me-2">
+                                    </i>
                                     <%= quiz.roomCode.toUpperCase() %>
                                 </span>
                                 <% } %>

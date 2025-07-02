@@ -358,19 +358,32 @@ class AuthService {
             // Room passwords
             const ROOM_PASSWORDS = {
                 'hrm': '123456',
-                'hse': '234567',
-                'gm': '345678',
-                'qasx': '345678',
-                'sm': '345678'
+                'hse': '123456',
+                'gm': '123456',
+                'qaqs': '123456',
+                'sm': '123456',
+                'fol': '123456',
+                'eol': '123456',
+                'it': '123456',
+                'mkt': '123456',
+                'eng': '123456',
+                'wh': '123456'
             };
+
 
             // Room names
             const ROOM_NAMES = {
                 'hrm': 'Human Resource Management',
                 'hse': 'Health, Safety & Environment',
                 'gm': 'General Management',
-                'qasx': 'Quality Assurance - Production',
-                'sm': 'Sales Marketing'
+                'qaqs': 'Quality Assurance - Production',
+                'sm': 'Sales Marketing',
+                'fol': 'Production - FOL',
+                'eol': 'Production - EOL',
+                'it': 'Information Technology',
+                'mkt': 'Marketing',
+                'eng': 'Engineering',
+                'wh': 'Warehouse'
             };
 
             if (!ROOM_PASSWORDS.hasOwnProperty(roomCode)) {

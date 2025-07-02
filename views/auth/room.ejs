@@ -36,10 +36,22 @@
             --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --qasx-color: #3b82f6;
-            --qasx-color-light: #93c5fd;
+            --qaqs-color: #3b82f6;
+            --qaqs-color-light: #93c5fd;
             --sm-color: #ec4899;
             --sm-color-light: #f9a8d4; 
+            --fol-color: #0ea5e9;
+            --fol-color-light: #7dd3fc;
+            --eol-color: #8b5cf6;
+            --eol-color-light: #c4b5fd;
+            --it-color: #10b981;
+            --it-color-light: #6ee7b7;
+            --mkt-color: #f59e0b;
+            --mkt-color-light: #fde68a;
+            --eng-color: #6366f1;
+            --eng-color-light: #a5b4fc;
+            --wh-color: #f97316;
+            --wh-color-light: #fdba74;
         }
 
         * {
@@ -336,14 +348,36 @@
             background: linear-gradient(135deg, var(--warning-color), var(--warning-color-light));
         }
 
-        .department-card[data-room="qasx"] .department-icon {
-            background: linear-gradient(135deg, var(--qasx-color), var(--qasx-color-light));
+        .department-card[data-room="qaqs"] .department-icon {
+            background: linear-gradient(135deg, var(--qaqs-color), var(--qaqs-color-light));
         }
 
         .department-card[data-room="sm"] .department-icon {
             background: linear-gradient(135deg, var(--sm-color), var(--sm-color-light));
         }
+        .department-card[data-room="fol"] .department-icon {
+            background: linear-gradient(135deg, var(--fol-color), var(--fol-color-light));
+        }
 
+        .department-card[data-room="eol"] .department-icon {
+            background: linear-gradient(135deg, var(--eol-color), var(--eol-color-light));
+        }
+
+        .department-card[data-room="it"] .department-icon {
+            background: linear-gradient(135deg, var(--it-color), var(--it-color-light));
+        }
+
+        .department-card[data-room="mkt"] .department-icon {
+            background: linear-gradient(135deg, var(--mkt-color), var(--mkt-color-light));
+        }
+
+        .department-card[data-room="eng"] .department-icon {
+            background: linear-gradient(135deg, var(--eng-color), var(--eng-color-light));
+        }
+
+        .department-card[data-room="wh"] .department-icon {
+            background: linear-gradient(135deg, var(--wh-color), var(--wh-color-light));
+        }
         .department-card:hover .department-icon,
         .department-card.selected .department-icon {
             transform: scale(1.1);
@@ -652,7 +686,7 @@
                                 <div class="department-name"><%= t('auth:room_hrm') %></div>
                                 <div class="department-description"><%= t('auth:room_hrm_desc') %></div>
                             </div>
-                            
+
                             <div class="department-card" data-room="hse" onclick="selectDepartment('hse')">
                                 <div class="department-icon">
                                     <i class="fas fa-shield-alt"></i>
@@ -660,27 +694,76 @@
                                 <div class="department-name"><%= t('auth:room_hse') %></div>
                                 <div class="department-description"><%= t('auth:room_hse_desc') %></div>
                             </div>
-                            
+
                             <div class="department-card" data-room="gm" onclick="selectDepartment('gm')">
                                 <div class="department-icon">
-                                    <i class="fas fa-crown"></i>
+                                    <i class="fas fa-briefcase"></i>
                                 </div>
                                 <div class="department-name"><%= t('auth:room_gm') %></div>
                                 <div class="department-description"><%= t('auth:room_gm_desc') %></div>
                             </div>
-                            <div class="department-card" data-room="qasx" onclick="selectDepartment('qasx')">
+
+                            <div class="department-card" data-room="qaqs" onclick="selectDepartment('qaqs')">
                                 <div class="department-icon">
                                     <i class="fas fa-clipboard-check"></i>
                                 </div>
-                                <div class="department-name"><%= t('auth:room_qasx') %></div>
-                                <div class="department-description"><%= t('auth:room_qasx_desc') %></div>
+                                <div class="department-name"><%= t('auth:room_qaqs') %></div>
+                                <div class="department-description"><%= t('auth:room_qaqs_desc') %></div>
                             </div>
+
                             <div class="department-card" data-room="sm" onclick="selectDepartment('sm')">
                                 <div class="department-icon">
-                                    <i class="fas fa-bullhorn"></i>
+                                    <i class="fas fa-crown"></i>
                                 </div>
                                 <div class="department-name"><%= t('auth:room_sm') %></div>
                                 <div class="department-description"><%= t('auth:room_sm_desc') %></div>
+                            </div>
+                            <div class="department-card" data-room="fol" onclick="selectDepartment('fol')">
+                                <div class="department-icon">
+                                    <i class="fas fa-industry"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_fol') %></div>
+                                <div class="department-description"><%= t('auth:room_fol_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="eol" onclick="selectDepartment('eol')">
+                                <div class="department-icon">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_eol') %></div>
+                                <div class="department-description"><%= t('auth:room_eol_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="it" onclick="selectDepartment('it')">
+                                <div class="department-icon">
+                                    <i class="fas fa-laptop-code"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_it') %></div>
+                                <div class="department-description"><%= t('auth:room_it_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="mkt" onclick="selectDepartment('mkt')">
+                                <div class="department-icon">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_mkt') %></div>
+                                <div class="department-description"><%= t('auth:room_mkt_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="eng" onclick="selectDepartment('eng')">
+                                <div class="department-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_eng') %></div>
+                                <div class="department-description"><%= t('auth:room_eng_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="wh" onclick="selectDepartment('wh')">
+                                <div class="department-icon">
+                                    <i class="fas fa-warehouse"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_wh') %></div>
+                                <div class="department-description"><%= t('auth:room_wh_desc') %></div>
                             </div>
                         </div>
                     </div>
@@ -756,8 +839,14 @@
                 hrm: '<%= t("auth:department_names.hrm") %>',
                 hse: '<%= t("auth:department_names.hse") %>',
                 gm: '<%= t("auth:department_names.gm") %>',
-                qasx: '<%= t("auth:department_names.qasx") %>',
-                sm: '<%= t("auth:department_names.sm") %>'
+                qaqs: '<%= t("auth:department_names.qaqs") %>',
+                sm: '<%= t("auth:department_names.sm") %>',
+                fol: '<%= t("auth:department_names.fol") %>',
+                eol: '<%= t("auth:department_names.eol") %>',
+                it: '<%= t("auth:department_names.it") %>',
+                mkt: '<%= t("auth:department_names.mkt") %>',
+                eng: '<%= t("auth:department_names.eng") %>',
+                wh: '<%= t("auth:department_names.wh") %>'
             },
             loadingStates: {
                 validating: '<%= t("auth:loading_states.validating") %>',

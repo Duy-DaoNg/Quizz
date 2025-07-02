@@ -460,8 +460,14 @@ class AuthController {
             'hrm': 'Human Resource Management',
             'hse': 'Health, Safety & Environment',
             'gm': 'General Management',
-            'qasx': 'Quality Assurance - Production',
-            'sm': 'Sales Marketing'
+            'qaqs': 'Quality Assurance & Quality System',
+            'sm': 'Sales Marketing',
+            'fol': 'SX-FOL',
+            'eol': 'SX-EOL',
+            'it': 'Công nghệ thông tin',
+            'mkt': 'Marketing',
+            'eng': 'Kỹ Thuật',
+            'wh': 'Kho'
         };
         return roomNames[roomCode] || roomCode.toUpperCase();
     };
