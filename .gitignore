@@ -24,3 +24,4 @@ package-lock.json
 
 /public/uploads/*
 !/public/uploads/.gitkeep
+*.zip

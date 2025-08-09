@@ -54,6 +54,7 @@ class TestService {
                 quizNumber: quiz.number,
                 roomCode,
                 mode,
+                totalQuestions: quiz.questions.length,
                 maxParticipants: Math.min(maxParticipants, 1000), // Cap at 1000
                 scheduleSettings: mode === 'offline' ? scheduleSettings : null,
                 status: mode === 'offline' ? 'active' : 'waiting', // NEW: Offline tests start as active
@@ -1472,6 +1473,7 @@ class TestService {
                             title: updatedTest.quizId.title,
                             number: updatedTest.quizNumber
                         },
+                        totalQuestions: updatedTest.totalQuestions,
                         mode: updatedTest.mode,
                         status: updatedTest.status,
                         completedAt: updatedTest.status === 'completed' ? updatedTest.updatedAt : null,
@@ -1488,6 +1490,7 @@ class TestService {
                         title: freshTest.quizId.title,
                         number: freshTest.quizNumber
                     },
+                    totalQuestions: freshTest.totalQuestions,
                     mode: freshTest.mode,
                     status: freshTest.status,
                     completedAt: freshTest.status === 'completed' ? freshTest.updatedAt : null,
@@ -1508,6 +1511,7 @@ class TestService {
                         title: updatedTest.quizId.title,
                         number: updatedTest.quizNumber
                     },
+                    totalQuestions: updatedTest.totalQuestions,
                     mode: updatedTest.mode,
                     status: updatedTest.status,
                     completedAt: updatedTest.updatedAt,
@@ -1522,6 +1526,7 @@ class TestService {
                     title: test.quizId.title,
                     number: test.quizNumber
                 },
+                totalQuestions: test.totalQuestions,
                 mode: test.mode,
                 status: test.status,
                 completedAt: test.updatedAt,

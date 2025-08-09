@@ -74,7 +74,9 @@ const testSchema = new mongoose.Schema({
         min: 1,
         max: 1000
     },
-    
+    totalQuestions: {
+        type: Number
+    },
     // Schedule settings (for offline mode)
     scheduleSettings: {
         startTime: Date,

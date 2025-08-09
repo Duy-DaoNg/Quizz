@@ -80,6 +80,11 @@ const quizSchema = new mongoose.Schema({
         endTime: Date
     },
     questions: [questionSchema],
+    // Time is seconds for offline mode
+    testDuration: {
+        type: Number,
+        required: true,
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
