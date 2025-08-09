@@ -214,5 +214,9 @@
   "duplicating_quiz": "Duplicating Quiz...",
   "quiz_duplicated": "Quiz Duplicated!",
   "quiz_duplicated_text": "The quiz copy has been created successfully.",
-  "failed_duplicate_quiz": "Failed to duplicate the quiz. Please try again."
+  "failed_duplicate_quiz": "Failed to duplicate the quiz. Please try again.",
+  "test_duration": "Test Duration (minutes)",
+  "test_duration_help": "Enter the duration of the test (1-180 minutes)",
+  "invalid_test_duration": "Test duration must be between 1 and 180 minutes",
+  "create_quiz_error": "Error creating quiz"
 }

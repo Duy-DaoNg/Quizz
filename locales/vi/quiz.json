@@ -213,5 +213,10 @@
   "duplicating_quiz": "Đang tạo bản sao...",
   "quiz_duplicated": "Đã sao chép bài kiểm tra!",
   "quiz_duplicated_text": "Bản sao bài kiểm tra đã được tạo thành công.",
-  "failed_duplicate_quiz": "Không thể sao chép bài kiểm tra. Vui lòng thử lại."
+  "failed_duplicate_quiz": "Không thể sao chép bài kiểm tra. Vui lòng thử lại.",
+
+  "test_duration": "Thời gian kiểm tra (phút)",
+  "test_duration_help": "Nhập thời gian của bài kiểm tra (1-180 phút)",
+  "invalid_test_duration": "Thời gian kiểm tra phải từ 1 đến 180 phút",
+  "create_quiz_error": "Lỗi khi tạo quiz"
 }

@@ -104,13 +104,14 @@ class QuizService {
                 title: quizInfo.title.trim(),
                 mode: quizInfo.mode,
                 roomCode: quizInfo.roomCode,
-                scheduleSettings: quizInfo.mode === 'offline' ? quizInfo.scheduleSettings : null,
+                // Thêm testDuration cho mode offline
+                testDuration: quizInfo.mode === 'offline' ? quizInfo.testDuration : null,
                 questions: processedQuestions,
-                createdBy: null, // Add user ID here if available from req.session
+                createdBy: null,
                 metadata: {
                     totalDuration: totalDuration,
                     version: '2.0',
-                    estimatedDuration: this.formatDuration(totalDuration),
+                    estimatedDuration: this.formatDuration(quizInfo.mode === 'offline' ? quizInfo.testDuration * 60 : totalDuration),
                     difficulty: this.calculateDifficulty(processedQuestions),
                     tags: this.extractTags(quizInfo.title),
                     lastModified: new Date()
@@ -129,6 +130,7 @@ class QuizService {
             return quiz;
             
         } catch (error) {
+            console.error('Error creating quiz:', error);
             // Delete uploaded files if error occurs
             if (files) {
                 const filesToDelete = Array.isArray(files) ? files : Object.values(files).flat();
@@ -365,10 +367,12 @@ class QuizService {
                     mode: quizInfo.mode,
                     roomCode: roomCode,
                     scheduleSettings: quizInfo.mode === 'offline' ? quizInfo.scheduleSettings : null,
+                    // Cập nhật testDuration cho mode offline
+                    testDuration: quizInfo.mode === 'offline' ? quizInfo.testDuration : null,
                     questions: processedQuestions,
                     'metadata.totalDuration': totalDuration,
                     'metadata.lastModified': new Date(),
-                    'metadata.estimatedDuration': this.formatDuration(totalDuration),
+                    'metadata.estimatedDuration': this.formatDuration(quizInfo.mode === 'offline' ? quizInfo.testDuration * 60 : totalDuration),
                     'metadata.difficulty': this.calculateDifficulty(processedQuestions),
                     'metadata.tags': this.extractTags(quizInfo.title),
                     'metadata.version': '2.0'

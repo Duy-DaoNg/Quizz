@@ -63,7 +63,11 @@ function loadInitialData(data) {
         if (endTime) document.getElementById('endTime').value = new Date(endTime).toISOString().slice(0, 16);
     }
     
-    // toggleScheduleSettings();
+    if (data.testDuration) {
+        document.getElementById('testDuration').value = data.testDuration;
+    }
+    
+    toggleScheduleSettings();
     
     // Load questions
     questions = data.questions.map((q, index) => ({
@@ -101,6 +105,22 @@ function setupEventListeners() {
             });
         }
     });
+    
+    // Add quiz mode change listener
+    document.getElementById('quizMode').addEventListener('change', () => {
+        toggleScheduleSettings();
+        triggerAutoSave();
+        updateQuizStatistics();
+    });
+
+    // Add test duration change listener
+    const testDurationEl = document.getElementById('testDuration');
+    if (testDurationEl) {
+        testDurationEl.addEventListener('input', () => {
+            triggerAutoSave();
+            updateQuizStatistics();
+        });
+    }
 }
 
 // =================== QUESTION MANAGEMENT ===================
@@ -163,6 +183,7 @@ function renderAllQuestions() {
 
 function createQuestionHtml(question) {
     const optionsHtml = createOptionsHtml(question);
+    const mode = document.getElementById('quizMode').value;
     
     return `
         <div class="question-card-modern animate-slide-up" id="question-${question.id}">
@@ -200,7 +221,7 @@ function createQuestionHtml(question) {
                             <label class="form-label-modern">${t.questionContent || 'Question Content'}</label>
                         </div>
                         
-                        <div class="form-floating-modern">
+                        <div class="form-floating-modern question-time-input" style="display: ${mode === 'offline' ? 'none' : 'block'}">
                             <input type="number" 
                                    class="form-control-modern" 
                                    id="question-${question.id}-time"
@@ -464,16 +485,25 @@ function selectCorrectAnswer(questionId, letter) {
 function updateQuizStatistics() {
     const questionCountEl = document.getElementById('questionCount');
     const totalDurationEl = document.getElementById('totalDuration');
+    const mode = document.getElementById('quizMode').value;
     
     if (questionCountEl) {
         questionCountEl.textContent = questions.length;
     }
     
     if (totalDurationEl) {
-        const totalSeconds = questions.reduce((sum, q) => sum + (q.answerTime || DEFAULT_ANSWER_TIME), 0);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        totalDurationEl.textContent = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        if (mode === 'offline') {
+            // Hide parent element of totalDuration
+            document.getElementById('totalDurationContainer').classList.add('d-none');
+        } else {
+            // Show parent element and update duration
+            document.getElementById('totalDurationContainer').classList.remove('d-none');
+            totalDurationEl.closest('.d-flex').style.display = 'flex';
+            const totalSeconds = questions.reduce((sum, q) => sum + (q.answerTime || DEFAULT_ANSWER_TIME), 0);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            totalDurationEl.textContent = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+        }
     }
 }
 
@@ -771,8 +801,6 @@ function restoreDraft(draftData) {
     
     if (draftData.startTime) document.getElementById('startTime').value = draftData.startTime;
     if (draftData.endTime) document.getElementById('endTime').value = draftData.endTime;
-    
-    // toggleScheduleSettings();
     
     questions = draftData.questions || [];
     questionCount = questions.length > 0 ? Math.max(...questions.map(q => q.id)) : 0;
@@ -1177,12 +1205,23 @@ function validateQuizData() {
         return false;
     }
     
+    const mode = document.getElementById('quizMode').value;
+    
     for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         if (!question.content.trim()) {
             const msg = t.questionEmpty ? 
                 t.questionEmpty.replace('{{number}}', i + 1) :
                 `Question ${i + 1} is empty`;
+            showNotification(msg, 'error');
+            return false;
+        }
+        
+        // Only validate answer time for online mode
+        if (mode === 'online' && (!question.answerTime || question.answerTime < 5 || question.answerTime > 3000)) {
+            const msg = t.invalidAnswerTime ?
+                t.invalidAnswerTime.replace('{{number}}', i + 1) :
+                `Question ${i + 1} needs a valid answer time (5-300 seconds)`;
             showNotification(msg, 'error');
             return false;
         }
@@ -1228,16 +1267,18 @@ function submitQuizToServer(isUpdate) {
     const quizInfo = {
         title: document.getElementById('quizTitle').value,
         mode: document.getElementById('quizMode').value,
-        scheduleSettings: null
+        testDuration: null
     };
 
-    // if (quizInfo.mode === 'offline') {
-    //     const startTime = document.getElementById('startTime').value;
-    //     const endTime = document.getElementById('endTime').value;
-    //     if (startTime && endTime) {
-    //         quizInfo.scheduleSettings = { startTime, endTime };
-    //     }
-    // }
+    if (quizInfo.mode === 'offline') {
+        const testDuration = parseInt(document.getElementById('testDuration').value);
+        if (testDuration && testDuration > 0) {
+            quizInfo.testDuration = testDuration;
+        } else {
+            showNotification(t.invalidTestDuration || 'Please enter a valid test duration', 'error');
+            return;
+        }
+    }
 
     const questionsData = questions.map((question, index) => {
         const imgElement = document.querySelector(`#question-${index + 1} .image-upload-zone img`);
@@ -1277,7 +1318,7 @@ function submitQuizToServer(isUpdate) {
                     throw new Error(data.error || 'Network response was not ok');
                 });
             }
-            return response.json();
+            return response.json;
         })
         .then(data => {
             if (!isUpdate) {
@@ -1312,6 +1353,20 @@ function submitQuizToServer(isUpdate) {
 }
 
 // =================== UTILITY FUNCTIONS ===================
+
+function toggleScheduleSettings() {
+    const mode = document.getElementById('quizMode').value;
+    const scheduleSettings = document.getElementById('scheduleSettings');
+    const questionTimeInputs = document.querySelectorAll('.question-time-input');
+    
+    // Toggle schedule settings
+    scheduleSettings.style.display = mode === 'offline' ? 'block' : 'none';
+    
+    // Toggle question time inputs
+    questionTimeInputs.forEach(input => {
+        input.style.display = mode === 'offline' ? 'none' : 'block';
+    });
+}
 
 // function toggleScheduleSettings() {
 //     const mode = document.getElementById('quizMode').value;

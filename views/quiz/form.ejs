@@ -15,6 +15,9 @@
         #languageDropdown {
             background: black;
         }
+        d-none {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -105,28 +108,27 @@
                         </div>
     
                         <!-- Schedule Settings -->
-                        <!-- <div id="scheduleSettings" style="display: <%= isEdit && quiz.mode === 'offline' ? 'block' : 'none' %>;">
-                            <div class="alert alert-info">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                <%= t('quiz:schedule_info') %>
-                            </div>
+                        <div id="scheduleSettings" style="display: <%= isEdit && quiz.mode === 'offline' ? 'block' : 'none' %>;">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-floating-modern">
-                                        <input type="datetime-local" class="form-control-modern" id="startTime"
-                                               value="<%= isEdit && quiz.scheduleSettings?.startTime ? new Date(quiz.scheduleSettings.startTime).toISOString().slice(0, 16) : '' %>">
-                                        <label class="form-label-modern"><%= t('quiz:start_time') %></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-floating-modern">
-                                        <input type="datetime-local" class="form-control-modern" id="endTime"
-                                               value="<%= isEdit && quiz.scheduleSettings?.endTime ? new Date(quiz.scheduleSettings.endTime).toISOString().slice(0, 16) : '' %>">
-                                        <label class="form-label-modern"><%= t('quiz:end_time') %></label>
+                                        <input type="number" 
+                                               class="form-control-modern" 
+                                               id="testDuration" 
+                                               min="1" 
+                                               max="180"
+                                               value="<%= isEdit && quiz.testDuration ? quiz.testDuration : 30 %>"
+                                               placeholder=" ">
+                                        <label class="form-label-modern">
+                                            <i class="fas fa-clock me-1"></i><%= t('quiz:test_duration') %>
+                                        </label>
+                                        <small class="form-text text-muted">
+                                            <%= t('quiz:test_duration_help') %>
+                                        </small>
                                     </div>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="d-flex flex-column h-100">
@@ -136,7 +138,7 @@
                                     <span class="text-muted"><%= t('quiz:questions') %></span>
                                     <span class="fw-bold" id="questionCount"><%= isEdit ? quiz.questions.length : 0 %></span>
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-2">
+                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-2" id="totalDurationContainer">
                                     <span class="text-muted"><%= t('quiz:total_duration') %></span>
                                     <span class="fw-bold" id="totalDuration">0 min</span>
                                 </div>
@@ -357,7 +359,12 @@ window.translations = {
     draftRestored: '<%= t("quiz:draft_restored") %>',
     
     // Copy labels
-    copy: '<%= t("quiz:copy") %>'
+    copy: '<%= t("quiz:copy") %>',
+
+    // Test duration translations
+    test_duration: '<%= t("quiz:test_duration") %>',
+    test_duration_help: '<%= t("quiz:test_duration_help") %>',
+    invalidTestDuration: '<%= t("quiz:invalid_test_duration") %>'
 };
 
 // Initialize quiz data safely

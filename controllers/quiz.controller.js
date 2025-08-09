@@ -277,7 +277,10 @@ class QuizController {
             res.render('quiz/form', {
                 title: req.t('quiz:edit_quiz') + ` #${quiz.number} - ` + getRoomName(roomInfo?.code || quiz.roomCode),
                 isEdit: true,
-                quiz: quiz,
+                quiz: {
+                    ...quiz.toObject(),
+                    testDuration: quiz.testDuration || null
+                },
                 user: req.session.user,
                 roomInfo: roomInfo,
                 lng: req.language || 'vi',
@@ -515,7 +518,8 @@ class QuizController {
                     title: `${originalQuiz.title} (${copyLabel})`,
                     mode: originalQuiz.mode,
                     roomCode: originalQuiz.roomCode, // Preserve room code
-                    scheduleSettings: originalQuiz.scheduleSettings
+                    scheduleSettings: originalQuiz.scheduleSettings,
+                    testDuration: originalQuiz.testDuration || null,
                 }),
                 questionsData: JSON.stringify(originalQuiz.questions.map((q, index) => ({
                     number: index + 1,
