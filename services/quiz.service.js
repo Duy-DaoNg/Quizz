@@ -492,9 +492,6 @@ class QuizService {
 
             return quizzes.map(quiz => {
                 const quizObject = quiz.toObject();
-                if (quiz.title === "sgfdas") {
-                    console.log(quiz);
-                }
                 // Calculate enhanced statistics
                 const questionCount = quiz.questions.length;
                 const hasImages = quiz.questions.some(q => q.image);
