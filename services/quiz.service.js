@@ -487,12 +487,14 @@ class QuizService {
             });
 
             const quizzes = await Quiz.find()
-                .select('number title mode roomCode questions scheduleSettings createdAt updatedAt metadata')
+                .select('number title mode roomCode questions scheduleSettings createdAt updatedAt metadata testDuration')
                 .sort({updatedAt: -1,  number: 1}); // Sort by quiz number ascending
 
             return quizzes.map(quiz => {
                 const quizObject = quiz.toObject();
-                
+                if (quiz.title === "sgfdas") {
+                    console.log(quiz);
+                }
                 // Calculate enhanced statistics
                 const questionCount = quiz.questions.length;
                 const hasImages = quiz.questions.some(q => q.image);

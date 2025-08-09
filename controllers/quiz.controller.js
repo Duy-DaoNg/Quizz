@@ -22,20 +22,18 @@ function getQuizStatus(quiz) {
     }
 }
 
-// Helper function to estimate quiz duration
-function estimateQuizDuration(questions) {
-    if (!questions || questions.length === 0) return '0 min';
-    
-    const totalSeconds = questions.reduce((sum, question) => {
-        return sum + (question.answerTime || 30);
-    }, 0);
-    
+// Thay thế estimateQuizDuration bằng formatDuration
+function formatDuration(totalSeconds) {
     if (totalSeconds < 60) {
         return `${totalSeconds}s`;
-    } else {
+    } else if (totalSeconds < 3600) {
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
         return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+    } else {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
     }
 }
 
@@ -331,10 +329,9 @@ class QuizController {
             
             // Add additional stats and formatting with quiz number support
             const enhancedQuizzes = paginatedQuizzes.map(quiz => {
-                // Migrate quiz data if needed
-                // const migratedQuiz = migrateQuizData(quiz);
                 const migratedQuiz = quiz;
-                
+                const totalSeconds = migratedQuiz.questions ?
+                    migratedQuiz.questions.reduce((sum, q) => sum + (q.answerTime || 30), 0) : 0;
                 // Calculate completion percentage
                 const completionRate = quiz.totalCount > 0 ? 
                     Math.round((quiz.completedCount / quiz.totalCount) * 100) : 0;
@@ -367,7 +364,8 @@ class QuizController {
                     hasParticipants: (quiz.totalCount || 0) > 0,
                     averageScore: quiz.averageScore || 0,
                     status: getQuizStatus(quiz),
-                    estimatedDuration: estimateQuizDuration(migratedQuiz.questions),
+                    estimatedDuration: formatDuration(quiz.mode === 'offline' ? quiz.testDuration * 60 : totalSeconds),
+                    totalDuration: totalSeconds,
                     // Enhanced metadata
                     totalDuration: migratedQuiz.questions ? 
                         migratedQuiz.questions.reduce((sum, q) => sum + (q.answerTime || 30), 0) : 0,
