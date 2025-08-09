@@ -281,17 +281,17 @@
                                 <% if (quiz.roomCode) { %>
                                 <span class="badge badge-language" style="background: linear-gradient(135deg, var(--warning-color), #d97706);">
                                     <i class="fas 
-                                        <%= roomInfo.roomCode === 'hrm' ? 'fa-users' :
-                                            roomInfo.roomCode === 'hse' ? 'fa-shield-alt' :
-                                            roomInfo.roomCode === 'qaqs' ? 'fa-clipboard-check' :
-                                            roomInfo.roomCode === 'sm' ? 'fa-crown' :
-                                            roomInfo.roomCode === 'gm' ? 'fa-briefcase' :
-                                            roomInfo.roomCode === 'fol' ? 'fa-industry' :
-                                            roomInfo.roomCode === 'eol' ? 'fa-cogs' :
-                                            roomInfo.roomCode === 'it' ? 'fa-laptop-code' :
-                                            roomInfo.roomCode === 'mkt' ? 'fa-bullhorn' :
-                                            roomInfo.roomCode === 'eng' ? 'fa-tools' :
-                                            roomInfo.roomCode === 'wh' ? 'fa-warehouse' :
+                                        <%= quiz.roomCode === 'hrm' ? 'fa-users' :
+                                            quiz.roomCode === 'hse' ? 'fa-shield-alt' :
+                                            quiz.roomCode === 'qaqs' ? 'fa-clipboard-check' :
+                                            quiz.roomCode === 'sm' ? 'fa-crown' :
+                                            quiz.roomCode === 'gm' ? 'fa-briefcase' :
+                                            quiz.roomCode === 'fol' ? 'fa-industry' :
+                                            quiz.roomCode === 'eol' ? 'fa-cogs' :
+                                            quiz.roomCode === 'it' ? 'fa-laptop-code' :
+                                            quiz.roomCode === 'mkt' ? 'fa-bullhorn' :
+                                            quiz.roomCode === 'eng' ? 'fa-tools' :
+                                            quiz.roomCode === 'wh' ? 'fa-warehouse' :
                                             'fa-question-circle' %> me-2">
                                     </i>
                                     <%= quiz.roomCode.toUpperCase() %>
