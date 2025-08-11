@@ -176,5 +176,9 @@
   "test_cancelled_message": "Phiên test này đã bị quản trị viên hủy bỏ.",
   "test_full_message": "Phiên test này đã đầy. Vui lòng thử lại sau.",
   "test_unavailable": "Test Không Khả Dụng",
-  "test_unavailable_message": "Bài test này hiện không khả dụng."
+  "test_unavailable_message": "Bài test này hiện không khả dụng.",
+  "submit_test": "Nộp bài",
+  "questions_list": "Danh sách câu hỏi",
+  "confirm_submit": "Xác nhận nộp bài",
+  "confirm_submit_message": "Bạn có chắc chắn muốn nộp bài test không?"
 }

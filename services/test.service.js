@@ -652,24 +652,134 @@ class TestService {
     }
     
     /**
-     * NEW: Update ONLY specific participant in finalResults AND recalculate all ranks (Atomic operation)
+     * NEW: Complete offline test with answers - New method
      */
-    async updateParticipantInFinalResults(testCode, completedParticipant) {
+    async completeOfflineTestWithAnswers(testCode, participantName, timeRemaining, submittedAnswers) {
+        const requestId = `comp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+        
         try {
+            // Get test data
+            const test = await Test.findOne({ testCode }).populate('quizId');
+            
+            if (!test) {
+                throw new Error('Test not found');
+            }
+            
+            // Check if participant can complete
+            const canComplete = test.canCompleteParticipant(participantName);
+            if (!canComplete.canComplete) {
+                if (canComplete.reason === 'Participant already completed') {
+                    return this._getExistingCompletionResult(testCode, participantName, canComplete.completedAt);
+                }
+                throw new Error(canComplete.reason);
+            }
+
+            console.log(`✅ [${requestId}] Processing completion for ${participantName}`);
+
+            // Calculate final score and verify answers
+            const quiz = test.quizId;
+            let finalScore = 0;
+            let correctAnswers = 0;
+
+            submittedAnswers.forEach(answer => {
+                const question = quiz.questions[answer.questionNumber];
+                if (question && question.correctAnswer === answer.selectedAnswer) {
+                    correctAnswers++;
+                    finalScore += answer.points;
+                }
+            });
+
+            // Update participant's answers and score atomically
+            const updateResult = await Test.findOneAndUpdate(
+                {
+                    testCode: testCode,
+                    'participants': {
+                        $elemMatch: {
+                            name: participantName,
+                            isActive: true,
+                            completedAt: null
+                        }
+                    }
+                },
+                {
+                    $set: {
+                        'participants.$.answers': submittedAnswers,
+                        'participants.$.score': finalScore,
+                        'participants.$.completedAt': new Date()
+                    },
+                    $inc: { version: 1 }
+                },
+                { new: true }
+            );
+
+            if (!updateResult) {
+                throw new Error('Failed to update participant completion status');
+            }
+
+            // Get updated participant
+            const completedParticipant = updateResult.participants.find(p => p.name === participantName);
+
+            // Update final results and rankings
+            const rankingUpdate = await this.updateParticipantInFinalResults(testCode, completedParticipant.name);
+
+            // Get completion progress
+            const completionProgress = updateResult.getCompletionProgress();
+
+            return {
+                participant: {
+                    name: completedParticipant.name,
+                    score: finalScore,
+                    correctAnswers: correctAnswers,
+                    totalQuestions: quiz.questions.length,
+                    completionTime: Math.round((completedParticipant.completedAt - completedParticipant.joinedAt) / 1000),
+                    finalRank: rankingUpdate.newParticipantRank
+                },
+                completionProgress: completionProgress,
+                ranking: {
+                    participantRank: rankingUpdate.newParticipantRank,
+                    totalRankedParticipants: rankingUpdate.totalParticipants,
+                    updatedLeaderboard: rankingUpdate.updatedRanking.slice(0, 10)
+                }
+            };
+
+        } catch (error) {
+            console.error(`❌ [${requestId}] Complete offline test error:`, {
+                testCode,
+                participantName,
+                error: error.message
+            });
+            throw error;
+        }
+    }
+    /**
+     * Helper method to update participant in final results
+     */
+    async updateParticipantInFinalResults(testCode, participantName) {
+        try {
+            // Find the test and participant
+            const test = await Test.findOne({ testCode });
+            if (!test) {
+                throw new Error('Test not found');
+            }
+            const participant = test.participants.find(p => p.name === participantName);
+            if (!participant) {
+                throw new Error('Participant not found');
+            }
+            
             // Calculate participant's result data
             const newParticipantResult = {
-                name: completedParticipant.name,
-                score: completedParticipant.score,
-                correctAnswers: completedParticipant.answers.filter(a => a.isCorrect).length,
-                totalQuestions: completedParticipant.answers.length,
-                completionTime: Math.round((completedParticipant.completedAt - completedParticipant.joinedAt) / 1000),
-                completedAt: completedParticipant.completedAt
+                name: participant.name,
+                score: participant.score,
+                correctAnswers: participant.answers.filter(a => a.isCorrect).length,
+                totalQuestions: participant.answers.length,
+                completionTime: Math.round((participant.completedAt - participant.joinedAt) / 1000),
+                completedAt: participant.completedAt
             };
             
             // ATOMIC: Get current test state and update finalResults completely
             const currentTest = await Test.findOne({ testCode }).lean();
             const existingResults = (currentTest.finalResults || []).filter(result => 
-                result.name !== completedParticipant.name // Remove existing entry if any
+                result.name !== participant.name // Remove existing entry if any
             );
             
             // Add new participant and recalculate ALL ranks
@@ -720,10 +830,10 @@ class TestService {
             }
             
             // Log the ranking changes
-            const newParticipantRank = rankedResults.find(r => r.name === completedParticipant.name)?.rank;
+            const newParticipantRank = rankedResults.find(r => r.name === participant.name)?.rank;
             const rankingPreview = rankedResults.slice(0, 5).map(r => `${r.rank}. ${r.name} (${r.score}pts)`).join(', ');
             
-            console.log(`📊 Updated finalResults for ${completedParticipant.name} in test ${testCode}`);
+            console.log(`📊 Updated finalResults for ${participant.name} in test ${testCode}`);
             console.log(`   New participant rank: ${newParticipantRank}`);
             console.log(`   Top 5 ranking: ${rankingPreview}`);
             

@@ -218,5 +218,6 @@
   "test_duration": "Thời gian kiểm tra (phút)",
   "test_duration_help": "Nhập thời gian của bài kiểm tra (1-180 phút)",
   "invalid_test_duration": "Thời gian kiểm tra phải từ 1 đến 180 phút",
-  "create_quiz_error": "Lỗi khi tạo quiz"
+  "create_quiz_error": "Lỗi khi tạo quiz",
+  "get_quiz_error": "Lỗi khi lấy quiz"
 }

@@ -47,8 +47,8 @@ router.post('/join', TestController.validateAndJoinTest);
 // Submit offline answer
 router.post('/submit-offline-answer', TestController.submitOfflineAnswer);
 
-// Complete offline test
-router.post('/complete-offline-test', TestController.completeOfflineTest);
+// Complete offline test with answers
+router.post('/complete-offline-test', TestController.completeOfflineTestWithAnswers);
 
 // ========================================
 // ADMIN ROUTES

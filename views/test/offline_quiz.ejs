@@ -386,6 +386,103 @@
                 right: 5px;
             }
         }
+
+        /* Sidebar styles */
+        .quiz-sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            padding: 1rem;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .quiz-timer-large {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-timer-large .timer-text {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-nav-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .question-nav-item:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        .question-nav-item.current {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .question-nav-item.answered {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .submit-test-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .submit-test-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Adjust main content to make room for sidebar */
+        .quiz-preview-container {
+            margin-right: 280px;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-sidebar {
+                display: none;
+            }
+            .quiz-preview-container {
+                margin-right: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -484,8 +581,9 @@
                     correctAnswer: q.correctAnswer,
                     answerTime: q.answerTime || 30,
                     image: q.image
-                }))
-            }
+                })),
+                testDuration: quiz.testDuration
+            },
         }) %>
     </script>
 
@@ -533,7 +631,13 @@
             // Completion
             greatJob: '<%= t("test:great_job") || "Great job!" %>',
             finishedTest: '<%= t("test:finished_test") || "You\'ve finished the test." %>',
-            detailedResults: '<%= t("test:detailed_results") || "View Detailed Results" %>'
+            detailedResults: '<%= t("test:detailed_results") || "View Detailed Results" %>',
+
+            // Subbmit
+            confirmSubmit: '<%= t("test:confirm_submit") %>',
+            confirmSubmitMessage: '<%= t("test:confirm_submit_message") %>',
+            submit: '<%= t("common:submit") %>',
+            cancel: '<%= t("common:cancel") %>',
         };
     </script>
 
@@ -555,39 +659,170 @@
         let hasSubmittedAnswer = false;
         let selectedTimeRemaining = 0;
         let isSubmitedTest = false;
+        let testTimer = null;
+        let testTimeRemaining = 0;
 
         document.addEventListener('DOMContentLoaded', function() {
             quizData = JSON.parse(document.getElementById('quiz-data').textContent);
-            // Start the first question immediately
+            // Set up test duration timer
+            testTimeRemaining = (quizData.quiz.testDuration || 30) * 60; // Convert minutes to seconds
+            startTestTimer();
+            // Initialize question navigation
+            initQuestionNav();
+            // Start with first question
             showQuestion(0);
         });
 
-        function showQuestion(questionIndex) {
-            if (questionIndex >= quizData.quiz.questions.length) {
-                completeTest();
-                return;
-            }
-
-            currentQuestionIndex = questionIndex;
-            const question = quizData.quiz.questions[questionIndex];
-            isAnswering = true;
-            hasSubmittedAnswer = false;
-            selectedAnswer = null;
-            selectedTimeRemaining = 0;
-            
-            // Hide auto-advance notice
-            document.getElementById('autoAdvanceNotice').style.display = 'none';
-            
-            // Display question
-            displayQuestion(question);
-            
-            // Start timer
-            timeRemaining = question.answerTime || 30;
-            startQuestionTimer();
+        function initQuestionNav() {
+            const nav = document.getElementById('questionNav');
+            nav.innerHTML = quizData.quiz.questions.map((q, index) => `
+                <div class="question-nav-item" 
+                     id="nav-q${index}" 
+                     onclick="showQuestion(${index})"
+                     data-question="${index + 1}">
+                    ${index + 1}
+                </div>
+            `).join('');
+            updateQuestionNav();
         }
 
+        function updateQuestionNav() {
+            // Remove all special classes first
+            document.querySelectorAll('.question-nav-item').forEach(item => {
+                item.classList.remove('current', 'answered');
+            });
+
+            // Mark current question
+            const currentNav = document.getElementById(`nav-q${currentQuestionIndex}`);
+            if (currentNav) {
+                currentNav.classList.add('current');
+            }
+
+            // Mark answered questions
+            answers.forEach(answer => {
+                if (answer.selectedAnswer) {
+                    const navItem = document.getElementById(`nav-q${answer.questionNumber}`);
+                    if (navItem) {
+                        navItem.classList.add('answered');
+                    }
+                }
+            });
+        }
+
+        function startTestTimer() {
+            updateTestTimerDisplay();
+            testTimer = setInterval(() => {
+                testTimeRemaining--;
+                updateTestTimerDisplay();
+                
+                if (testTimeRemaining <= 0) {
+                    clearInterval(testTimer);
+                    completeTest();
+                }
+            }, 1000);
+        }
+        async function completeTest() {
+            if (isSubmitedTest) return; // Prevent multiple submissions
+            
+            isSubmitedTest = true;
+            clearInterval(testTimer);
+
+            try {
+                // Submit test completion to server
+                const response = await fetch('/test/complete-offline-test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        testCode: quizData.testCode,
+                        participantName: quizData.participantName,
+                        timeRemaining: testTimeRemaining,
+                        answers: answers
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+                document.querySelector('.quiz-sidebar').style.display = 'none';
+                // Hide quiz content and show completion summary
+                document.getElementById('quizContent').style.display = 'none';
+                document.getElementById('completionSummary').style.display = 'block';
+                
+                // Update summary with server response data
+                document.getElementById('finalScore').textContent = result.results.participant.score;
+                document.getElementById('correctAnswers').textContent = result.results.participant.correctAnswers;
+                document.getElementById('totalTime').textContent = formatTime(Math.floor((Date.now() - startTime) / 1000));
+                
+                // Show completion message
+                Swal.fire({
+                    title: window.translations.testCompleted || 'Test Completed',
+                    text: window.translations.thankYou || 'Thank you for completing the test!',
+                    icon: 'success',
+                    confirmButtonText: window.translations.viewResults || 'View Results'
+                });
+
+            } catch (error) {
+                console.error('Complete test error:', error);
+                isSubmitedTest = false; // Allow retry
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Failed to submit test',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        function updateTestTimerDisplay() {
+            const hours = Math.floor(testTimeRemaining / 3600);
+            const minutes = Math.floor((testTimeRemaining % 3600) / 60);
+            const seconds = testTimeRemaining % 60;
+            
+            document.getElementById('testTimerHours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('testTimerMinutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('testTimerSeconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        function confirmSubmitTest() {
+            Swal.fire({
+                title: window.translations.confirmSubmit || 'Submit Test?',
+                text: window.translations.confirmSubmitMessage || 'Are you sure you want to submit your test? This action cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: window.translations.submit || 'Submit',
+                cancelButtonText: window.translations.cancel || 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    completeTest();
+                }
+            });
+        }
+
+        // Update existing functions
+        function showQuestion(questionIndex) {
+            // Remove timer-related code
+            currentQuestionIndex = questionIndex;
+            const question = quizData.quiz.questions[questionIndex];
+            displayQuestion(question);
+            updateQuestionNav();
+        }
         function displayQuestion(question) {
             const container = document.getElementById('previewQuestionContainer');
+            
+            // Find existing answer for this question
+            const existingAnswer = answers.find(a => a.questionNumber === currentQuestionIndex);
             
             let questionHTML = `
                 <div class="question-display-container">
@@ -611,9 +846,11 @@
             question.options.forEach(option => {
                 if (option.text && option.text.trim()) {
                     const colorClass = `letter-${option.letter.toLowerCase()}`;
+                    const isSelected = existingAnswer && existingAnswer.selectedAnswer === option.letter;
+                    const selectedClasses = isSelected ? 'selected pulse-selection' : '';
                     
                     questionHTML += `
-                        <div class="preview-option" 
+                        <div class="preview-option ${selectedClasses}" 
                             data-letter="${option.letter}" 
                             onclick="selectAnswer('${option.letter}')">
                             <div class="preview-option-content">
@@ -636,365 +873,73 @@
                 }
             }, 100);
         }
-
         function selectAnswer(letter) {
-            if (!isAnswering || hasSubmittedAnswer) return;
+            // if (hasSubmittedAnswer) return;
             
-            // Set selected answer
+            // Remove classes from previously selected option if exists
+            const previousAnswer = answers.find(a => a.questionNumber === currentQuestionIndex);
+            if (previousAnswer) {
+                const previousOption = document.querySelector(`.preview-option[data-letter="${previousAnswer.selectedAnswer}"]`);
+                if (previousOption) {
+                    previousOption.classList.remove('selected', 'pulse-selection');
+                }
+            }
+            
+            // Add classes to newly selected option
+            const selectedOption = document.querySelector(`.preview-option[data-letter="${letter}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected', 'pulse-selection');
+            }
+            
             selectedAnswer = letter;
-            selectedTimeRemaining = timeRemaining;
+            // hasSubmittedAnswer = true;
             
-            // Visual selection - remove previous selection
-            const options = document.querySelectorAll('.preview-option');
-            options.forEach(opt => {
-                opt.classList.remove('selected');
-                opt.classList.remove('pulse-selection');
-            });
-            
-            // Add selection to new option
-            const selectedOption = document.querySelector(`[data-letter="${selectedAnswer}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected');
-                selectedOption.classList.add('pulse-selection');
-            }
-            
-            hasSubmittedAnswer = true;
-            
-            // Submit answer to server (offline mode)
-            submitAnswerToServer(selectedAnswer, selectedTimeRemaining);
-            
-            // Show submission status
-            showSubmissionStatus();
-            
-            // Process answer offline
-            processOfflineAnswer(selectedAnswer);
-        }
-
-        function processOfflineAnswer(selectedLetter) {
-            const question = quizData.quiz.questions[currentQuestionIndex];
-            const isCorrect = question.correctAnswer === selectedLetter;
-            const points = calculatePoints(isCorrect, timeRemaining);
-            
-            // Stop timer
-            if (questionTimer) {
-                clearInterval(questionTimer);
-                questionTimer = null;
-            }
-            
-            isAnswering = false;
-            
-            // Update score
-            if (isCorrect) {
-                currentScore += points;
-                document.getElementById('playerScore').textContent = currentScore;
-            }
-            
-            // Store answer
-            answers.push({
+            // Update answers array
+            const answerData = {
                 questionNumber: currentQuestionIndex,
-                selectedAnswer: selectedLetter,
-                correctAnswer: question.correctAnswer,
-                isCorrect: isCorrect,
-                points: points,
-                timeRemaining: timeRemaining
-            });
-            
-            // Show answer feedback
-            showAnswerFeedback(selectedLetter, isCorrect);
-            
-            // Auto-advance after 2 seconds
-            setTimeout(() => {
-                nextQuestion();
-            }, 2000);
-        }
-
-        function calculatePoints(isCorrect, timeLeft) {
-            if (!isCorrect) return 0;
-            
-            const question = quizData.quiz.questions[currentQuestionIndex];
-            const totalTime = question.answerTime || 30;
-            const timePercentage = timeLeft / totalTime;
-            
-            return Math.round(10 + (10 * timePercentage));
-        }
-
-        function showAnswerFeedback(selectedLetter, isCorrect) {
-            const options = document.querySelectorAll('.preview-option');
-            const question = quizData.quiz.questions[currentQuestionIndex];
-            
-            options.forEach(option => {
-                const letter = option.getAttribute('data-letter');
-                const statusElement = option.querySelector('.preview-option-status');
-                
-                option.classList.add('disabled');
-                
-                if (letter === selectedLetter) {
-                    if (isCorrect) {
-                        option.classList.add('correct');
-                        statusElement.innerHTML = '<i class="fas fa-check-circle text-success"></i>';
-                    } else {
-                        option.classList.add('wrong');
-                        statusElement.innerHTML = '<i class="fas fa-times-circle text-danger"></i>';
-                    }
-                } else if (letter === question.correctAnswer && !isCorrect) {
-                    option.classList.add('correct');
-                    statusElement.innerHTML = '<i class="fas fa-check-circle text-success"></i>';
-                }
-            });
-        }
-
-        function startQuestionTimer() {
-            const timerElement = document.getElementsByClassName('quiz-timer-compact')[0];
-            if (timerElement) {
-                timerElement.style.display = 'block';
-            }
-            let counter = 0;
-            let intervalTime = 50;
-            let randomNumber = Math.floor(Math.random() * 1000) + 1 - intervalTime;
-            updateTimerDisplay();
-            questionTimer = setInterval(() => {
-                counter += intervalTime;
-                if (counter >= 1000) {
-                    counter = 0;
-                    timeRemaining--;
-                    updateTimerDisplay();            
-                }
-                if (timeRemaining <= 1 && counter > Math.max(randomNumber, 400)) {
-                    timeRemaining=0;
-                    counter = 0;
-                    updateTimerDisplay();
-                    handleTimeUp();
-                }
-            }, intervalTime);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            
-            const minutesEl = document.getElementById('timerMinutes');
-            const secondsEl = document.getElementById('timerSeconds');
-            
-            if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
-            if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
-            
-            // Update timer circle color
-            const timerCircle = document.querySelector('.timer-circle');
-            if (timerCircle) {
-                const question = quizData.quiz.questions[currentQuestionIndex];
-                const totalTime = question ? question.answerTime : 30;
-                const percentageLeft = (timeRemaining / totalTime) * 100;
-                
-                timerCircle.classList.remove('warning', 'danger');
-                
-                if (percentageLeft <= 10) {
-                    timerCircle.classList.add('danger');
-                } else if (percentageLeft <= 30) {
-                    timerCircle.classList.add('warning');
-                }
-            }
-        }
-
-        function handleTimeUp() {
-            if (!isAnswering) return;
-            
-            if (questionTimer) {
-                clearInterval(questionTimer);
-                questionTimer = null;
-            }
-            
-            isAnswering = false;
-            
-            // No answer selected - submit null
-            answers.push({
-                questionNumber: currentQuestionIndex,
-                selectedAnswer: null,
+                selectedAnswer: letter,
                 correctAnswer: quizData.quiz.questions[currentQuestionIndex].correctAnswer,
-                isCorrect: false,
-                points: 0,
-                timeRemaining: 0
-            });
-            
-            submitAnswerToServer(null, 0);
-            
-            // Show auto-advance notice
-            showAutoAdvanceNotice();
-        }
+                isCorrect: letter === quizData.quiz.questions[currentQuestionIndex].correctAnswer,
+                points: letter === quizData.quiz.questions[currentQuestionIndex].correctAnswer ? 10 : 0
+            };
 
-        function showAutoAdvanceNotice() {
-            const notice = document.getElementById('autoAdvanceNotice');
-            notice.style.display = 'block';
-            
-            let countdown = 3;
-            document.getElementById('autoAdvanceTimer').textContent = countdown;
-            
-            autoAdvanceTimer = setInterval(() => {
-                countdown--;
-                document.getElementById('autoAdvanceTimer').textContent = countdown;
-                
-                if (countdown <= 0) {
-                    clearInterval(autoAdvanceTimer);
-                    nextQuestion();
-                }
-            }, 1000);
-        }
-
-        function nextQuestion() {
-            if (autoAdvanceTimer) {
-                clearInterval(autoAdvanceTimer);
-                autoAdvanceTimer = null;
-            }
-            
-            const nextIndex = currentQuestionIndex + 1;
-            
-            if (nextIndex < quizData.quiz.questions.length) {
-                showQuestion(nextIndex);
+            const existingAnswerIndex = answers.findIndex(a => a.questionNumber === currentQuestionIndex);
+            if (existingAnswerIndex >= 0) {
+                answers[existingAnswerIndex] = answerData;
             } else {
-                completeTest();
-            }
-        }
-
-        function completeTest() {
-            // Clear any running timers
-            if (questionTimer) clearInterval(questionTimer);
-            if (autoAdvanceTimer) clearInterval(autoAdvanceTimer);
-            
-            const totalTime = Date.now() - startTime;
-            const correctCount = answers.filter(a => a.isCorrect).length;
-            
-            // Hide question container
-            document.getElementById('quizContent').style.display = 'none';
-            document.getElementById('autoAdvanceNotice').style.display = 'none';
-            
-            // Show completion summary
-            const summary = document.getElementById('completionSummary');
-            document.getElementById('finalScore').textContent = currentScore;
-            document.getElementById('correctAnswers').textContent = `${correctCount}/${answers.length}`;
-            document.getElementById('totalTime').textContent = formatTime(totalTime);
-            summary.style.display = 'block';
-            
-            // Submit completion to server
-            submitTestCompletion();
-        }
-
-        function showSubmissionStatus() {
-            // Disable all options
-            const options = document.querySelectorAll('.preview-option');
-            options.forEach(option => {
-                option.style.pointerEvents = 'none';
-                option.style.opacity = '0.7';
-            });
-            
-            // Highlight selected option
-            const selectedOption = document.querySelector(`[data-letter="${selectedAnswer}"]`);
-            if (selectedOption) {
-                selectedOption.style.opacity = '1';
-                selectedOption.classList.add('submitted');
-                
-                // Add submitted icon
-                const statusElement = selectedOption.querySelector('.preview-option-status');
-                if (statusElement) {
-                    statusElement.innerHTML = '<i class="fas fa-check text-success"></i>';
-                }
+                answers.push(answerData);
             }
             
-            // Show notification
-            showSubmittedNotification();
+            // Update UI
+            // showAnswerFeedback(letter, answerData.isCorrect);
+            updateQuestionNav();
+            // submitAnswerToServer(letter);
         }
 
-        function showSubmittedNotification() {
-            // Create notification element
-            let notification = document.getElementById('submissionNotification');
-            if (!notification) {
-                notification = document.createElement('div');
-                notification.id = 'submissionNotification';
-                notification.className = 'alert alert-success';
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 100px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    z-index: 9999;
-                    min-width: 300px;
-                    text-align: center;
-                    animation: slideDown 0.3s ease-out;
-                `;
-                document.body.appendChild(notification);
-            }
-            
-            notification.innerHTML = `
-                <i class="fas fa-check-circle me-2"></i>
-                ${window.translations.answerSubmitted}! ${window.translations.processing}
-            `;
-            
-            notification.style.display = 'block';
-            
-            // Hide after 2 seconds
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 2000);
-        }
-
-        function submitAnswerToServer(selectedAnswer, timeRemaining) {
-            fetch('/test/submit-offline-answer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    testCode: quizData.testCode,
-                    participantName: quizData.participantName,
-                    questionNumber: currentQuestionIndex,
-                    selectedAnswer: selectedAnswer,
-                    timeRemaining: timeRemaining
-                })
-            })
-            .then(response => response.json())
-            .catch(error => {
-                console.error('Submit answer error:', error);
-            });
-        }
-
-        function submitTestCompletion() {
-            fetch('/test/complete-offline-test', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    testCode: quizData.testCode,
-                    participantName: quizData.participantName
-                })
-            })
-            .then(response => {
-                isSubmitedTest = true;
-                return response.json();
-            })
-            .catch(error => {
-                console.error('Complete test error:', error);
-            });
-        }
-
-        function formatTime(milliseconds) {
-            const minutes = Math.floor(milliseconds / 60000);
-            const seconds = Math.floor((milliseconds % 60000) / 1000);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function viewResults() {
-            window.location.href = `/test/results/${quizData.testCode}`;
-        }
-
-        // Handle beforeunload to submit partial completion
-        window.addEventListener('beforeunload', function(e) {
-            if ((isAnswering || currentQuestionIndex < quizData.quiz.questions.length) && !isSubmitedTest) {
-                // Submit partial completion
-                navigator.sendBeacon('/test/complete-offline-test', JSON.stringify({
-                    testCode: quizData.testCode,
-                    participantName: quizData.participantName
-                }));
-            }
-        });
+        // Remove or comment out unused timer functions
+        // function startQuestionTimer() {...}
+        // function handleTimeUp() {...}
+        // function showAutoAdvanceNotice() {...}
     </script>
+
+    <!-- Thêm trước </body> -->
+    <div class="quiz-sidebar">
+        <div class="quiz-timer-large">
+            <div class="small mb-1"><%= t('test:time_remaining') %></div>
+            <div class="timer-text">
+                <span id="testTimerHours">00</span>:<span id="testTimerMinutes">00</span>:<span id="testTimerSeconds">00</span>
+            </div>
+        </div>
+        
+        <h6 class="mb-3"><%= t('test:questions_list') %></h6>
+        <div class="question-nav" id="questionNav">
+            <!-- Questions nav will be populated by JavaScript -->
+        </div>
+
+        <button class="submit-test-btn" onclick="confirmSubmitTest()">
+            <i class="fas fa-paper-plane me-2"></i>
+            <%= t('test:submit_test') %>
+        </button>
+    </div>
 </body>
 </html>

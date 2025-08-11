@@ -177,5 +177,10 @@
   "test_cancelled_message": "This test session has been cancelled by the administrator.",
   "test_full_message": "This test session is full. Please try again later.",
   "test_unavailable": "Test Unavailable",
-  "test_unavailable_message": "This test is currently not available."
+  "test_unavailable_message": "This test is currently not available.",
+  "submit_test": "Submit Test",
+  "questions_list": "Questions List",
+  "confirm_submit": "Confirm Submit",
+  "confirm_submit_message": "Are you sure you want to submit the test?"
+
 }

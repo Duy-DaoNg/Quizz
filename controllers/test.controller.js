@@ -453,6 +453,53 @@ class TestController {
     }
     
     /**
+     * Complete offline test with answers - New method
+     */
+    async completeOfflineTestWithAnswers(req, res) {
+        try {
+            const { testCode, participantName, timeRemaining, answers } = req.body;
+
+            if (!testCode || !participantName || !Array.isArray(answers)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing required fields'
+                });
+            }
+            
+            // Validate session (optional but recommended)
+            const testSession = req.session?.testSession;
+            if (testSession && (testSession.testCode !== testCode || testSession.participantName !== participantName)) {
+                console.warn(`Session mismatch for ${participantName} in test ${testCode}`);
+            }
+            
+            const result = await TestService.completeOfflineTestWithAnswers(
+                testCode,
+                participantName,
+                timeRemaining,
+                answers
+            );
+            
+            // Clear session after completion
+            if (req.session?.testSession) {
+                delete req.session.testSession;
+            }
+            
+            res.json({
+                success: true,
+                message: 'Test completed successfully',
+                results: result
+            });
+            
+        } catch (error) {
+            console.error('Complete offline test error:', error);
+            res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
+    
+    /**
      * Get test results
      */
     async getTestResults(req, res) {
