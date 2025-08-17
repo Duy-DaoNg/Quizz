@@ -149,6 +149,9 @@
                                             roomInfo.roomCode === 'mkt' ? 'fa-bullhorn' :
                                             roomInfo.roomCode === 'eng' ? 'fa-tools' :
                                             roomInfo.roomCode === 'wh' ? 'fa-warehouse' :
+                                            roomInfo.roomCode === 'log' ? 'fa-shipping-fast' :
+                                            roomInfo.roomCode === 'pnp' ? 'fa-project-diagram' :
+                                            roomInfo.roomCode === 'acc' ? 'fa-file-invoice-dollar' :
                                             'fa-question-circle' %> me-2">
                                     </i>
                                     <%= roomInfo.name %> <%= t('survey:department') %>
@@ -301,6 +304,9 @@
                                             quiz.roomCode === 'mkt' ? 'fa-bullhorn' :
                                             quiz.roomCode === 'eng' ? 'fa-tools' :
                                             quiz.roomCode === 'wh' ? 'fa-warehouse' :
+                                            quiz.roomCode === 'log' ? 'fa-shipping-fast' :
+                                            quiz.roomCode === 'pnp' ? 'fa-project-diagram' :
+                                            quiz.roomCode === 'acc' ? 'fa-file-invoice-dollar' :
                                             'fa-question-circle' %> me-2">
                                     </i>
                                     <%= quiz.roomCode.toUpperCase() %>

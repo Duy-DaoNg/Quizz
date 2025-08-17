@@ -8,7 +8,7 @@ class SurveyService {
             // Default translation function
             const translate = t || ((key, options = {}) => {
                 const messages = {
-                    'survey:room_code_required': 'Valid room code is required (e.g., hrm, hse, gm, qaqs, sm, fol, eol, it, mkt, eng, wh)',
+                    'survey:room_code_required': 'Valid room code is required (e.g., hrm, hse,...)',
                     'survey:survey_created': 'Survey "{{title}}" (Number: {{number}}) created successfully for {{department}} department with {{questionCount}} questions',
                     'survey:create_survey_error': 'Error creating survey: {{error}}'
                 };
@@ -23,7 +23,7 @@ class SurveyService {
             const questionsData = JSON.parse(quizData.questionsData);
             
             // Validate room code (REQUIRED for new quizzes)
-            if (!quizInfo.roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(quizInfo.roomCode)) {
+            if (!quizInfo.roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(quizInfo.roomCode)) {
                 throw new Error(translate('survey:room_code_required'));
             }
             
@@ -168,7 +168,7 @@ class SurveyService {
                 return message;
             });
 
-            if (!roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(roomCode)) {
+            if (!roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(roomCode)) {
                 throw new Error(translate('survey:valid_room_code_required'));
             }
             
@@ -217,7 +217,7 @@ class SurveyService {
             
             // Preserve existing roomCode if not provided (for backward compatibility)
             let roomCode = survey.roomCode;
-            if (quizInfo.roomCode && ['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(quizInfo.roomCode)) {
+            if (quizInfo.roomCode && ['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(quizInfo.roomCode)) {
                 roomCode = quizInfo.roomCode;
             }
             
@@ -486,7 +486,10 @@ class SurveyService {
             "it": "Information Technology",
             "mkt": "Marketing",
             "eng": "Engineering",
-            "wh": "Warehouse"
+            "wh": "Warehouse",
+            "log": "Logistic",
+            "pnp": "Procurement - Planning",
+            "acc": "Accounting"
         };
         return roomNames[roomCode] || roomCode?.toUpperCase() || 'Unknown';
     }

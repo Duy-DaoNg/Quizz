@@ -1,0 +1,11 @@
+<i class="fas fa-users"></i>
+<i class="fas fa-shield-alt"></i>
+<i class="fas fa-briefcase"></i>
+<i class="fas fa-clipboard-check"></i>
+<i class="fas fa-crown"></i>
+<i class="fas fa-industry"></i>
+<i class="fas fa-cogs"></i>
+<i class="fas fa-laptop-code"></i>
+<i class="fas fa-bullhorn"></i>
+<i class="fas fa-tools"></i>
+<i class="fas fa-warehouse"></i>

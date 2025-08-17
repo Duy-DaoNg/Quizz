@@ -8,7 +8,7 @@ class QuizService {
             // Default translation function
             const translate = t || ((key, options = {}) => {
                 const messages = {
-                    'quiz:room_code_required': 'Valid room code is required (e.g., hrm, hse, gm, qaqs, sm, fol, eol, it, mkt, eng, wh)',
+                    'quiz:room_code_required': 'Valid room code is required (e.g., hrm, hse,...)',
                     'quiz:quiz_created': 'Quiz "{{title}}" (Number: {{number}}) created successfully for {{department}} department with {{questionCount}} questions',
                     'quiz:create_quiz_error': 'Error creating quiz: {{error}}'
                 };
@@ -23,7 +23,7 @@ class QuizService {
             const questionsData = JSON.parse(quizData.questionsData);
             
             // Validate room code (REQUIRED for new quizzes)
-            if (!quizInfo.roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(quizInfo.roomCode)) {
+            if (!quizInfo.roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(quizInfo.roomCode)) {
                 throw new Error(translate('quiz:room_code_required'));
             }
             
@@ -197,7 +197,7 @@ class QuizService {
                 return message;
             });
 
-            if (!roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(roomCode)) {
+            if (!roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(roomCode)) {
                 throw new Error(translate('quiz:valid_room_code_required'));
             }
             
@@ -246,7 +246,7 @@ class QuizService {
             
             // Preserve existing roomCode if not provided (for backward compatibility)
             let roomCode = quiz.roomCode;
-            if (quizInfo.roomCode && ['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(quizInfo.roomCode)) {
+            if (quizInfo.roomCode && ['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(quizInfo.roomCode)) {
                 roomCode = quizInfo.roomCode;
             }
             
@@ -552,7 +552,7 @@ class QuizService {
                 return message;
             });
 
-            if (!roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(roomCode)) {
+            if (!roomCode || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(roomCode)) {
                 throw new Error(translate('quiz:valid_room_code_required'));
             }
 
@@ -608,7 +608,10 @@ class QuizService {
             "it": "Information Technology",
             "mkt": "Marketing",
             "eng": "Engineering",
-            "wh": "Warehouse"
+            "wh": "Warehouse",
+            "log": "Logistic",
+            "pnp": "Procurement - Planning",
+            "acc": "Accounting"
         };
         return roomNames[roomCode] || roomCode?.toUpperCase() || 'Unknown';
     }
@@ -1053,7 +1056,7 @@ class QuizService {
         try {
             const translate = t || ((key, options = {}) => {
                 const messages = {
-                    'quiz:invalid_room_code': 'Invalid room code. Must be hrm, hse, gm, qaqs, sm, fol, eol, it, mkt, eng, wh',
+                    'quiz:invalid_room_code': 'Invalid room code. Must be hrm,...',
                     'quiz:room_assignment_success': 'Assigned {{roomCode}} room code to {{count}} quizzes',
                     'quiz:room_assignment_error': 'Error assigning room code: {{error}}'
                 };
@@ -1064,7 +1067,7 @@ class QuizService {
                 return message;
             });
 
-            if (!['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(targetRoomCode)) {
+            if (!['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(targetRoomCode)) {
                 throw new Error(translate('quiz:invalid_room_code'));
             }
 

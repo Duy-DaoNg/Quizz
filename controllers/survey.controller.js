@@ -46,7 +46,10 @@ function getRoomName(roomCode) {
         'it': 'Công nghệ thông tin',
         'mkt': 'Marketing',
         'eng': 'Kỹ Thuật',
-        'wh': 'Kho'
+        'wh': 'Kho',
+        'log': 'Logistic',
+        'pnp': 'Thu mua - Kế hoạch',
+        'acc': 'Kế toán'
     };
     return roomNames[roomCode] || roomCode.toUpperCase();
 }

@@ -60,7 +60,7 @@ const publicSurveySchema = new mongoose.Schema({
     roomCode: {
         type: String,
         required: true,
-        enum: ['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh']
+        enum: ['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'],
     },
     
     // Test configuration

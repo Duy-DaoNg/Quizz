@@ -116,7 +116,10 @@ function getRoomName(roomCode) {
         'it': 'Công nghệ thông tin',
         'mkt': 'Marketing',
         'eng': 'Kỹ Thuật',
-        'wh': 'Kho'
+        'wh': 'Kho',
+        'log': 'Logistic',
+        'pnp': 'Thu mua - Kế hoạch',
+        'acc': 'Kế toán'
     };
     return roomNames[roomCode] || roomCode.toUpperCase();
 }
@@ -634,8 +637,8 @@ class QuizController {
     async migrateQuizzes(req, res) {
         try {
             const { targetRoom } = req.body; // Room code to assign to all existing quizzes
-            
-            if (!targetRoom || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh'].includes(targetRoom)) {
+
+            if (!targetRoom || !['hrm', 'hse', 'gm', 'qaqs', 'sm', 'fol', 'eol', 'it', 'mkt', 'eng', 'wh', 'log', 'pnp', 'acc'].includes(targetRoom)) {
                 return res.status(400).json({
                     success: false,
                     message: req.t('quiz:specify_valid_target_room')

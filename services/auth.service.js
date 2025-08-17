@@ -367,7 +367,10 @@ class AuthService {
                 'it': '123456',
                 'mkt': '123456',
                 'eng': '123456',
-                'wh': '123456'
+                'wh': '123456',
+                'log': '123456',
+                'pnp': '123456',
+                'acc': '123456'
             };
 
 
@@ -383,7 +386,10 @@ class AuthService {
                 'it': 'Information Technology',
                 'mkt': 'Marketing',
                 'eng': 'Engineering',
-                'wh': 'Warehouse'
+                'wh': 'Warehouse',
+                'log': 'Logistic',
+                'pnp': 'Procurement - Planning',
+                'acc': 'Accounting'
             };
 
             if (!ROOM_PASSWORDS.hasOwnProperty(roomCode)) {

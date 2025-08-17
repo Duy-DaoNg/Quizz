@@ -52,6 +52,12 @@
             --eng-color-light: #a5b4fc;
             --wh-color: #f97316;
             --wh-color-light: #fdba74;
+            --log-color: #4f46e5;
+            --log-color-light: #c4b5fd;
+            --pnp-color: #10b981;
+            --pnp-color-light: #6ee7b7;
+            --acc-color: #f59e0b;
+            --acc-color-light: #fde68a;
         }
 
         * {
@@ -378,6 +384,18 @@
         .department-card[data-room="wh"] .department-icon {
             background: linear-gradient(135deg, var(--wh-color), var(--wh-color-light));
         }
+        .department-card[data-room="log"] .department-icon {
+            background: linear-gradient(135deg, var(--log-color), var(--log-color-light));
+        }
+
+        .department-card[data-room="pnp"] .department-icon {
+            background: linear-gradient(135deg, var(--pnp-color), var(--pnp-color-light));
+        }
+
+        .department-card[data-room="acc"] .department-icon {
+            background: linear-gradient(135deg, var(--acc-color), var(--acc-color-light));
+        }
+
         .department-card:hover .department-icon,
         .department-card.selected .department-icon {
             transform: scale(1.1);
@@ -765,6 +783,28 @@
                                 <div class="department-name"><%= t('auth:room_wh') %></div>
                                 <div class="department-description"><%= t('auth:room_wh_desc') %></div>
                             </div>
+                            <div class="department-card" data-room="log" onclick="selectDepartment('log')">
+                                <div class="department-icon">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_log') %></div>
+                                <div class="department-description"><%= t('auth:room_log_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="pnp" onclick="selectDepartment('pnp')">
+                                <div class="department-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_pnp') %></div>
+                                <div class="department-description"><%= t('auth:room_pnp_desc') %></div>
+                            </div>
+
+                            <div class="department-card" data-room="acc" onclick="selectDepartment('acc')">
+                                <div class="department-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <div class="department-name"><%= t('auth:room_acc') %></div>
+                                <div class="department-description"><%= t('auth:room_acc_desc') %></div>
                         </div>
                     </div>
 
@@ -846,7 +886,10 @@
                 it: '<%= t("auth:department_names.it") %>',
                 mkt: '<%= t("auth:department_names.mkt") %>',
                 eng: '<%= t("auth:department_names.eng") %>',
-                wh: '<%= t("auth:department_names.wh") %>'
+                wh: '<%= t("auth:department_names.wh") %>',
+                log: '<%= t("auth:department_names.log") %>',
+                pnp: '<%= t("auth:department_names.pnp") %>',
+                acc: '<%= t("auth:department_names.acc") %>'
             },
             loadingStates: {
                 validating: '<%= t("auth:loading_states.validating") %>',
