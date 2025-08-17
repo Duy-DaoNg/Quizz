@@ -1,0 +1,378 @@
+<% layout = false %>
+<!DOCTYPE html>
+<html lang="<%= lng %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= isEdit ? t('survey:edit_survey_title') : t('survey:create_survey_title') %> - <%= t('common:app_name') %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/modern_quiz_form.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <style>
+        #languageDropdown {
+            background: black;
+        }
+        d-none {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+<div class="language-switcher-container" style="text-align: right;">
+    <%- include('../partials/language-switcher') %>
+</div>
+<div class="container-editor">
+    <!-- Language Switcher -->
+    
+    <!-- Auto-save indicator -->
+    <div class="auto-save" id="autoSaveIndicator">
+        <i class="fas fa-check-circle me-2"></i>
+        <span><%= isEdit ? t('survey:changes_saved') : t('survey:draft_saved') %></span>
+    </div>
+    
+    <div class="modern-quiz-editor">
+        <!-- Header Section -->
+        <div class="editor-header animate-fade-in">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-12">
+                        <div class="header-content">
+                            <h1 class="editor-title">
+                                <i class="fas <%= isEdit ? 'fa-edit' : 'fa-plus-circle' %> me-3"></i>
+                                <%= isEdit ? t('survey:edit_survey') : t('survey:create_new_survey') %>
+                            </h1>
+                            <p class="editor-subtitle">
+                                <%= isEdit ? t('survey:update_survey_subtitle') : t('survey:create_survey_subtitle') %>
+                            </p>
+                            <% if (isEdit) { %>
+                            <div class="quiz-meta">
+                                <span class="meta-badge">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <%= t('survey:created') %> <%= formatDate(quiz.createdAt) %>
+                                </span>
+                                <span class="meta-badge">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <%= t('survey:last_updated') %> <%= formatDate(quiz.updatedAt) %>
+                                </span>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 text-lg-start">
+                        <div class="header-actions" style="margin-top: 20px;">
+                            <a href="/surveys" class="btn btn-outline-light me-2">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                <%= t('survey:back_to_dashboard') %>
+                            </a>
+                            <button class="btn btn-primary-modern" onclick="previewSurvey()" data-bs-toggle="modal" data-bs-target="#previewModal">
+                                <i class="fas fa-eye me-2"></i>
+                                <%= t('survey:preview') %>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Quiz Information Section -->
+        <div class="modern-card animate-slide-up">
+            <div class="card-header-modern">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <%= t('survey:survey_information') %>
+                </h4>
+            </div>
+            <div class="card-body-modern">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="form-floating-modern">
+                            <input type="text" class="form-control-modern" id="quizTitle" placeholder=" " 
+                                   value="<%= isEdit ? quiz.title : '' %>" required>
+                            <label class="form-label-modern"><%= t('survey:survey_title') %></label>
+                        </div>
+    
+                        <!-- Schedule Settings -->
+                        <div id="scheduleSettings" style="display: block">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating-modern">
+                                        <input type="number" 
+                                                class="form-control-modern" 
+                                                id="testDuration" 
+                                                min="1" 
+                                                max="180"
+                                                value="<%= isEdit && quiz.testDuration ? quiz.testDuration : 30 %>"
+                                                placeholder=" ">
+                                        <label class="form-label-modern">
+                                            <i class="fas fa-clock me-1"></i><%= t('survey:test_duration') %>
+                                        </label>
+                                        <small class="form-text text-muted">
+                                            <%= t('survey:test_duration_help') %>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="d-flex flex-column h-100">
+                            <h6 class="text-primary mb-3"><%= t('survey:survey_statistics') %></h6>
+                            <div class="stat-card-mini">
+                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded mb-2">
+                                    <span class="text-muted"><%= t('survey:questions') %></span>
+                                    <span class="fw-bold" id="questionCount"><%= isEdit ? quiz.questions.length : 0 %></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                    <span class="text-muted"><%= t('survey:status') %></span>
+                                    <span class="badge bg-<%= isEdit ? 'success' : 'warning' %>">
+                                        <%= isEdit ? t('survey:active') : t('survey:draft') %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Questions Section -->
+        <div class="modern-card animate-slide-up">
+            <div class="card-header-modern d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>
+                    <%= t('survey:survey_questions') %>
+                </h4>
+                <button class="btn btn-outline-light" onclick="addQuestion()">
+                    <i class="fas fa-plus me-2"></i>
+                    <%= t('survey:add_question') %>
+                </button>
+            </div>
+            <div class="card-body-modern">
+                <div id="questionsContainer">
+                    <% if (isEdit && quiz.questions && quiz.questions.length > 0) { %>
+                        <% quiz.questions.forEach((question, index) => { %>
+                            <!-- Question cards will be rendered here by JavaScript -->
+                        <% }); %>
+                    <% } %>
+                </div>
+                
+                <!-- Add Question Button -->
+                <div class="add-question-btn" onclick="addQuestion()">
+                    <div class="add-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h5 class="mb-2"><%= t('survey:add_new_question') %></h5>
+                    <p class="text-muted mb-0">
+                        <%= isEdit ? t('survey:click_add_another') : t('survey:click_create_first') %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Submit Section -->
+        <div class="save-section">
+            <div class="save-card">
+                <div class="save-content">
+                    <h2 class="save-title">
+                        <%= isEdit ? t('survey:ready_update_survey') : t('survey:ready_create_survey') %>
+                    </h2>
+                    <p class="save-description">
+                        <%= isEdit ? t('survey:review_changes_update') : t('survey:review_before_publish') %>
+                    </p>
+                    <div class="save-actions">
+                        <button type="button" class="btn btn-outline-light btn-lg px-4" 
+                                data-bs-toggle="modal" data-bs-target="#previewModal" 
+                                onclick="previewSurvey()">
+                            <i class="fas fa-eye me-2"></i><%= t('survey:preview_survey') %>
+                        </button>
+                        <button type="button" class="btn btn btn-success-modern" onclick="<%= isEdit ? 'updateSurvey()' : 'publishSurvey()' %>">
+                            <i class="fas fa-<%= isEdit ? 'check-circle' : 'rocket' %> me-2"></i>
+                            <%= isEdit ? t('survey:update_survey') : t('survey:publish_survey') %>
+                        </button>
+                    </div>
+                </div>
+                <div class="save-icon">
+                    <i class="fas fa-<%= isEdit ? 'save' : 'magic' %>"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Updated Preview Modal - Single Question Display -->
+<div class="modal fade preview-modal" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div class="w-100">
+                    <div class="quiz-info-preview">
+                        <div class="quiz-info-content">
+                            <h4 class="mb-3"><%= t('survey:survey') %>: <span id="previewTitle"></span></h4>
+                            <p class="mb-2"><i class="fas fa-globe me-1"></i><strong><%= t('survey:mode') %>:</strong> <span id="previewMode"></span></p>
+                            <p class="mb-2"><i class="fas fa-question-circle me-1"></i><strong><%= t('survey:questions') %>:</strong> <span id="previewQuestionProgress"></span></p>
+                        </div>
+                        <div class="quiz-timer-section">
+                            <div class="timer-display">
+                                <div class="timer-circle" id="timerCircle">
+                                    <span class="timer-text" id="timerText"><span id="timerMinutes">00</span>:<span id="timerSeconds">30</span></span>
+                                </div>
+                            </div>
+                            <p class="mb-0 mt-2"><%= t('survey:time_remaining') %></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress mt-3" style="height: 20px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                            role="progressbar" style="width: 0%" 
+                            id="previewProgress" aria-valuenow="0" aria-valuemin="0" 
+                            aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Question Display -->
+                <div id="previewQuestionContainer">
+                    <!-- Single question will be displayed here -->
+                </div>
+                
+                <!-- Navigation -->
+                <div class="preview-navigation text-center mt-4">
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display: none;">
+                        <%= t('survey:next') %><i class="fas fa-arrow-right ms-1"></i>
+                    </button>
+                    <button class="btn btn-success" id="finishBtn" onclick="finishSurvey()" style="display: none;">
+                        <i class="fas fa-flag-checkered me-1"></i><%= t('survey:finish_survey') %>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i><%= t('survey:close_preview') %>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Translation object for JavaScript -->
+<script>
+window.translations = {
+    lng: '<%= lng %>',
+    // Form translations
+    questionLabel: '<%= t("survey:question") %>',
+    questionContent: '<%= t("survey:question_content") %>',
+    answerTime: '<%= t("survey:answer_time_seconds") %>',
+    uploadImage: '<%= t("survey:upload_image") %>',
+    clickSelectImage: '<%= t("survey:click_select_image") %>',
+    remove: '<%= t("survey:remove") %>',
+    answerOptions: '<%= t("survey:answer_options") %>',
+    removeOption: '<%= t("survey:remove_option") %>',
+    addOption: '<%= t("survey:add_option") %>',
+    enterOption: '<%= t("survey:enter_option") %>',
+    moveUp: '<%= t("survey:move_up") %>',
+    moveDown: '<%= t("survey:move_down") %>',
+    duplicate: '<%= t("survey:duplicate") %>',
+    delete: '<%= t("survey:delete") %>',
+    
+    // Validation messages
+    enterSurveyTitle: '<%= t("survey:enter_survey_title") %>',
+    addAtLeastOneQuestion: '<%= t("survey:add_at_least_one_question") %>',
+    questionEmpty: '<%= t("survey:question_empty") %>',
+    needTwoOptions: '<%= t("survey:need_two_options") %>',
+    needValidAnswer: '<%= t("survey:need_valid_answer") %>',
+    
+    // Action messages
+    deleteQuestion: '<%= t("survey:delete_question") %>',
+    deleteQuestionConfirm: '<%= t("survey:delete_question_confirm") %>',
+    yesDelete: '<%= t("survey:yes_delete") %>',
+    cancel: '<%= t("common:cancel") %>',
+    questionDeleted: '<%= t("survey:question_deleted") %>',
+    questionDuplicated: '<%= t("survey:question_duplicated") %>',
+    questionMoved: '<%= t("survey:question_moved") %>',
+    cannotMove: '<%= t("survey:cannot_move") %>',
+    alreadyAt: '<%= t("survey:already_at") %>',
+    top: '<%= t("survey:top") %>',
+    bottom: '<%= t("survey:bottom") %>',
+    up: '<%= t("survey:up") %>',
+    down: '<%= t("survey:down") %>',
+    
+    // Preview messages
+    noQuestions: '<%= t("survey:no_questions_preview") %>',
+    previewComplete: '<%= t("survey:preview_complete") %>',
+    reviewedAllQuestions: '<%= t("survey:reviewed_all_questions") %>',
+    restartPreview: '<%= t("survey:restart_preview") %>',
+    exitPreview: '<%= t("survey:exit_preview") %>',
+    
+    // Save messages
+    publishSurvey: '<%= t("survey:publish_survey") %>',
+    publishConfirm: '<%= t("survey:publish_confirm") %>',
+    publishConfirmText: '<%= t("survey:publish_confirm_text") %>',
+    yesPublish: '<%= t("survey:yes_publish") %>',
+    updateSurvey: '<%= t("survey:update_survey") %>',
+    updateConfirm: '<%= t("survey:update_confirm") %>',
+    updateConfirmText: '<%= t("survey:update_confirm_text") %>',
+    yesUpdate: '<%= t("survey:yes_update") %>',
+    publishing: '<%= t("survey:publishing") %>',
+    publishingText: '<%= t("survey:publishing_text") %>',
+    updating: '<%= t("survey:updating") %>',
+    updatingText: '<%= t("survey:updating_text") %>',
+    surveyPublished: '<%= t("survey:survey_published") %>',
+    surveyPublishedText: '<%= t("survey:survey_published_text") %>',
+    surveyUpdated: '<%= t("survey:survey_updated") %>',
+    surveyUpdatedText: '<%= t("survey:survey_updated_text") %>',
+    viewSurveyDashboard: '<%= t("survey:view_survey_dashboard") %>',
+    error: '<%= t("common:error") %>',
+    failedSaveSurvey: '<%= t("survey:failed_save_survey") %>',
+    
+    // Draft messages
+    draftFound: '<%= t("survey:draft_found") %>',
+    restoreDraftConfirm: '<%= t("survey:restore_draft_confirm") %>',
+    restoreDraft: '<%= t("survey:restore_draft") %>',
+    startFresh: '<%= t("survey:start_fresh") %>',
+    draftRestored: '<%= t("survey:draft_restored") %>',
+    
+    // Copy labels
+    copy: '<%= t("survey:copy") %>',
+
+    // Test duration translations
+    test_duration: '<%= t("survey:test_duration") %>',
+    test_duration_help: '<%= t("survey:test_duration_help") %>',
+    invalidTestDuration: '<%= t("survey:invalid_test_duration") %>'
+};
+
+// Initialize quiz data safely
+window.quizFormConfig = {
+    isEdit: <%= isEdit ? 'true' : 'false' %>,
+    <% if (isEdit) { %>
+    quizId: '<%= quiz._id %>',
+    initialData: {
+        title: <%- JSON.stringify(quiz.title) %>,
+        language: '<%= quiz.language %>',
+        scheduleSettings: <%- JSON.stringify(quiz.scheduleSettings || null) %>,
+        questions: <%- JSON.stringify(quiz.questions.map((question, index) => ({
+            id: index + 1,
+            content: question.content,
+            image: question.image || null,
+            answer: ""
+        }))) %>
+    }
+    <% } else { %>
+    quizId: null,
+    initialData: null
+    <% } %>
+};
+</script>
+
+<script src="/js/survey_form.js"></script>
+</body>
+</html>

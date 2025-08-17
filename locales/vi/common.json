@@ -50,5 +50,7 @@
   "refresh": "Làm mới",
   "go_home": "Về trang chủ", 
   "back_home": "Quay về trang chủ",
-  "duplicate": "Nhân bản"
+  "duplicate": "Nhân bản",
+  "manage_quiz": "Quản lý Quiz",
+  "manage_survey": "Quản lý Survey"
 }

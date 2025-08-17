@@ -50,5 +50,7 @@
   "refresh": "Refresh",
   "go_home": "Go Home",
   "back_home": "Back to Home",
-  "duplicate": "Duplicate"
+  "duplicate": "Duplicate",
+  "manage_quiz": "Manage Quiz",
+  "manage_survey": "Manage Survey"  
 }

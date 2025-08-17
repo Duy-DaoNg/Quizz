@@ -510,7 +510,7 @@
                     <div class="filter-header">
                         <h5 class="filter-title">
                             <i class="fas fa-filter me-2"></i>
-                            <%= t('test:filter_results') %>
+                            <%= t('publicsurvey:filter_results') %>
                             <% if (typeof roomInfo !== 'undefined' && roomInfo) { %>
                             <small class="text-muted">(<%= roomInfo.code.toUpperCase() %> <%= t('quiz:department') %>)</small>
                             <% } %>
@@ -518,15 +518,9 @@
                     </div>
                     <div class="filter-content">
                         <div class="filter-group">
-                            <span class="fw-semibold me-3"><%= t('test:test_mode') %>:</span>
+                            <span class="fw-semibold me-3"><%= t('publicsurvey:publicsurvey_mode') %>:</span>
                             <a href="?mode=all" class="btn-filter <%= mode === 'all' ? 'active' : '' %>">
-                                <i class="fas fa-list me-1"></i><%= t('test:all_tests') %>
-                            </a>
-                            <a href="?mode=online" class="btn-filter <%= mode === 'online' ? 'active' : '' %>">
-                                <i class="fas fa-wifi me-1"></i><%= t('test:online') %>
-                            </a>
-                            <a href="?mode=offline" class="btn-filter <%= mode === 'offline' ? 'active' : '' %>">
-                                <i class="fas fa-download me-1"></i><%= t('test:offline') %>
+                                <i class="fas fa-list me-1"></i><%= t('publicsurvey:all_publicsurveys') %>
                             </a>
                         </div>
                     </div>
@@ -540,9 +534,9 @@
                 <div class="results-header">
                     <h3 class="results-title">
                         <i class="fas fa-list-alt me-2"></i>
-                        <%= t('test:completed_tests') %>
+                        <%= t('publicsurvey:completed_publicsurveys') %>
                         <small class="text-muted ms-2">
-                            (<%= formatNumber(totalTests) %> <%= t('common:total') %>, <%= t('test:showing_page') %> <%= currentPage %> <%= t('common:of') %> <%= totalPages %>)
+                            (<%= formatNumber(totalTests) %> <%= t('common:total') %>, <%= t('publicsurvey:showing_page') %> <%= currentPage %> <%= t('common:of') %> <%= totalPages %>)
                         </small>
                     </h3>
                 </div>
@@ -551,19 +545,20 @@
                 <table class="table results-table">
                     <thead>
                         <tr>
-                            <th><%= t('test:test_information') %></th>
-                            <th><%= t('test:mode') %></th>
-                            <th style="text-align: center;"><%= t('test:participants') %></th>
-                            <th><%= t('test:completed_date') %></th>
+                            <th><%= t('publicsurvey:publicsurvey_information') %></th>
+                            <th><%= t('publicsurvey:mode') %></th>
+                            <th style="text-align: center;"><%= t('publicsurvey:participants') %></th>
+                            <th><%= t('publicsurvey:completed_date') %></th>
                         </tr>
                     </thead>
+                    <!-- <i class="fas fa-file-excel"></i> -->
                     <tbody>
                         <% tests.forEach(test => { %>
                         <tr onclick="viewTestResults('<%= test.testCode %>')" style="cursor: pointer;">
                             <td>
                                 <div class="test-info">
                                     <div class="test-icon <%= test.mode %>">
-                                        <i class="fas <%= test.mode === 'online' ? 'fa-wifi' : 'fa-download' %>"></i>
+                                        <i class="fas fa-file-excel"></i>
                                     </div>
                                     <div class="test-details">
                                         <h6><%= test.quizTitle %></h6>
@@ -573,7 +568,7 @@
                             </td>
                             <td>
                                 <span class="mode-badge <%= test.mode %>">
-                                    <i class="fas <%= test.mode === 'online' ? 'fa-wifi' : 'fa-download' %> me-1"></i>
+                                    <i class="fas fa-file-excel"></i>
                                     <%= t('test:' + test.mode) %>
                                 </span>
                             </td>
@@ -632,17 +627,13 @@
                     <div class="empty-icon">
                         <i class="fas fa-chart-bar"></i>
                     </div>
-                    <h4><%= t('test:no_test_results_found') %></h4>
+                    <h4><%= t('publicsurvey:no_publicsurvey_results_found') %></h4>
                     <p class="mb-0">
-                        <% if (mode !== 'all') { %>
-                            <%= ti('test:no_completed_mode_tests_found', { mode: t('test:' + mode).toLowerCase() }) %>
-                        <% } else { %>
-                            <%= t('test:no_completed_tests_found') %>
-                        <% } %>
+                            <%= ti('publicsurvey:no_completed_mode_publicsurveys_found', { mode: t('publicsurvey:' + mode).toLowerCase() }) %>
                     </p>
                     <div class="mt-3">
                         <a href="/quizzes" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i><%= t('quiz:create_new_quiz') %>
+                            <i class="fas fa-plus me-2"></i><%= t('survey:create_new_survey') %>
                         </a>
                     </div>
                 </div>
@@ -692,8 +683,8 @@
             cancelBtn: '<%= t("common:cancel") %>',
             errorTitle: '<%= t("common:error") %>',
             errorSwitchDepartment: '<%= t("quiz:error_switch_department") %>',
-            departmentStatistics: '<%= t("test:department_statistics") %>',
-            viewingResults: '<%= t("test:viewing_results") %>'
+            departmentStatistics: '<%= t("publicsurvey:department_statistics") %>',
+            viewingResults: '<%= t("publicsurvey:viewing_results") %>'
         };
     </script>
     
@@ -705,7 +696,7 @@
             row.style.transform = 'translateX(8px)';
             
             // Navigate to results page
-            window.location.href = `/test/results/${testCode}`;
+            window.location.href = `/publicsurvey/results/${testCode}`;
         }
 
         // Function to switch department

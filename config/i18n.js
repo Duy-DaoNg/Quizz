@@ -12,7 +12,7 @@ i18next
     backend: {
       loadPath: path.join(__dirname, '../locales/{{lng}}/{{ns}}.json')
     },
-    ns: ['common', 'auth', 'quiz', 'test', 'validation', 'error'],
+    ns: ['common', 'auth', 'quiz', 'test', 'validation', 'error', 'survey', 'publicsurvey'],
     defaultNS: 'common',
     detection: {
       order: ['querystring', 'cookie', 'header'],

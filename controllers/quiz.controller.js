@@ -372,7 +372,8 @@ class QuizController {
                     hasImages: migratedQuiz.questions ? 
                         migratedQuiz.questions.some(q => q.image) : false,
                     optionCounts: migratedQuiz.questions ? 
-                        migratedQuiz.questions.map(q => q.options ? q.options.length : 2) : []
+                        migratedQuiz.questions.map(q => q.options ? q.options.length : 2) : [],
+                    activePage: 'quizzes'
                 };
             });
             
@@ -422,6 +423,7 @@ class QuizController {
                         return startPage + i;
                     }).filter(p => p <= totalPages)
                 },
+                activePage: 'quizzes',
                 layout: false
             });
             

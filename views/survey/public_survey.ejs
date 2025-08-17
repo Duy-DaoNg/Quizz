@@ -483,6 +483,53 @@
                 margin-right: 0;
             }
         }
+        .answer-textarea {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .answer-textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        .form-floating > .answer-textarea {
+            padding: 1rem;
+        }
+
+        .form-floating > label {
+            padding: 1rem;
+            color: #64748b;
+        }
+
+        .answer-input-container {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .answer-textarea {
+                min-height: 100px;
+            }
+            
+            .form-floating > .answer-textarea {
+                padding: 0.75rem;
+            }
+            
+            .form-floating > label {
+                padding: 0.75rem;
+            }
+        }
+
         .quiz-sidebar {
             position: fixed;
             right: 0;
@@ -602,6 +649,9 @@
                 }
             }
         }
+
+
+
     </style>
 </head>
 <body>
@@ -618,26 +668,10 @@
                                     <%= quiz.title %>
                                 </h1>
                                 <p class="mb-0 opacity-75">
-                                    <%= t('test:test_code') %>: <strong><%= test.testCode %></strong> | 
-                                    <%= t('test:quiz_number') %> #<%= test.quizNumber %> | 
-                                    <%= quiz.questions.length %> <%= t('quiz:questions') %>
+                                    <%= t('publicsurvey:publicsurvey_code') %>: <strong><%= test.testCode %></strong> | 
+                                    <%= t('publicsurvey:quiz_number') %> #<%= test.quizNumber %> | 
+                                    <%= quiz.questions.length %> <%= t('survey:questions') %>
                                 </p>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="participant-score">
-                                    <span class="score-value" id="playerScore">0</span>
-                                    <div class="score-label"><%= t('test:your_score') %></div>
-                                </div>
-                                <!-- Timer Section -->
-                                <div class="quiz-timer-section">
-                                    <div class="quiz-timer-compact">
-                                        <div class="timer-circle" id="timerCircle">
-                                            <span class="timer-text" id="timerText">
-                                                <span id="timerMinutes">00</span>:<span id="timerSeconds">30</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -647,7 +681,7 @@
                 <div id="autoAdvanceNotice" class="auto-advance-notice" style="display: none;">
                     <div>
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong><%= t('test:auto_advance') || 'Time\'s up!' %></strong> <%= t('test:moving_to_next') || 'Moving to next question automatically...' %>
+                        <strong><%= t('publicsurvey:auto_advance') || 'Time\'s up!' %></strong> <%= t('publicsurvey:moving_to_next') || 'Moving to next question automatically...' %>
                     </div>
                     <div class="auto-advance-timer" id="autoAdvanceTimer">3</div>
                 </div>
@@ -665,22 +699,8 @@
                     <div class="completion-icon">
                         <i class="fas fa-trophy"></i>
                     </div>
-                    <h3><%= t('test:test_completed_desc') %></h3>
-                    <p class="lead mb-3"><%= t('test:thank_you') %></p>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h4 id="finalScore">0</h4>
-                            <small class="text-muted"><%= t('test:final_score') || 'Final Score' %></small>
-                        </div>
-                        <div class="col-md-4">
-                            <h4 id="correctAnswers">0</h4>
-                            <small class="text-muted"><%= t('test:correct_answers') %></small>
-                        </div>
-                        <div class="col-md-4">
-                            <h4 id="totalTime">0:00</h4>
-                            <small class="text-muted"><%= t('test:total_time') || 'Total Time' %></small>
-                        </div>
-                    </div>
+                    <h3><%= t('publicsurvey:publicsurvey_completed_desc') %></h3>
+                    <p class="lead mb-3"><%= t('publicsurvey:thank_you') %></p>
                 </div>
             </div>
         </div>
@@ -691,6 +711,7 @@
         <%- JSON.stringify({
             testCode: test.testCode,
             participantName: participantName,
+            participantId: participantId,
             quiz: {
                 title: quiz.title,
                 questions: quiz.questions.map((q, i) => ({
@@ -711,36 +732,36 @@
         window.translations = {
             lng: '<%= lng %>',
             // Test translations
-            testCode: '<%= t("test:test_code") %>',
-            quizTitle: '<%= t("test:quiz_title") %>',
+            publicsurveyCode: '<%= t("publicsurvey:publicsurvey_code") %>',
+            quizTitle: '<%= t("publicsurvey:quiz_title") %>',
             questions: '<%= t("quiz:questions") %>',
-            yourScore: '<%= t("test:your_score") %>',
-            testCompleted: '<%= t("test:test_completed") %>',
-            thankYou: '<%= t("test:thank_you") %>',
-            viewResults: '<%= t("test:view_results") %>',
-            finalScore: '<%= t("test:final_score") || "Final Score" %>',
-            correctAnswers: '<%= t("test:correct_answers") %>',
-            totalTime: '<%= t("test:total_time") || "Total Time" %>',
+            yourScore: '<%= t("publicsurvey:your_score") %>',
+            publicsurveyCompleted: '<%= t("publicsurvey:publicsurvey_completed") %>',
+            thankYou: '<%= t("publicsurvey:thank_you") %>',
+            viewResults: '<%= t("publicsurvey:view_results") %>',
+            finalScore: '<%= t("publicsurvey:final_score") || "Final Score" %>',
+            correctAnswers: '<%= t("publicsurvey:correct_answers") %>',
+            totalTime: '<%= t("publicsurvey:total_time") || "Total Time" %>',
             
             // Answer feedback
-            correct: '<%= t("test:correct") %>',
-            incorrect: '<%= t("test:incorrect") %>',
-            score: '<%= t("test:score") %>',
+            correct: '<%= t("publicsurvey:correct") %>',
+            incorrect: '<%= t("publicsurvey:incorrect") %>',
+            score: '<%= t("publicsurvey:score") %>',
             
             // Submission messages
-            answerSubmitted: '<%= t("test:answer_submitted") %>',
-            waitingForOthers: '<%= t("test:waiting_for_others") %>',
-            processing: '<%= t("test:processing") || "Processing..." %>',
+            answerSubmitted: '<%= t("publicsurvey:answer_submitted") %>',
+            waitingForOthers: '<%= t("publicsurvey:waiting_for_others") %>',
+            processing: '<%= t("publicsurvey:processing") || "Processing..." %>',
             
             // Timer and auto-advance
-            timeUp: '<%= t("test:time_up") || "Time\'s up!" %>',
-            movingToNext: '<%= t("test:moving_to_next") || "Moving to next question automatically..." %>',
-            autoAdvance: '<%= t("test:auto_advance") || "Auto advancing" %>',
+            timeUp: '<%= t("publicsurvey:time_up") || "Time\'s up!" %>',
+            movingToNext: '<%= t("publicsurvey:moving_to_next") || "Moving to next question automatically..." %>',
+            autoAdvance: '<%= t("publicsurvey:auto_advance") || "Auto advancing" %>',
             
             // Navigation
-            question: '<%= t("test:question") %>',
-            nextQuestion: '<%= t("test:next_question") %>',
-            finishTest: '<%= t("test:finish_test") %>',
+            question: '<%= t("publicsurvey:question") %>',
+            nextQuestion: '<%= t("publicsurvey:next_question") %>',
+            finishpublicsurvey: '<%= t("publicsurvey:finish_publicsurvey") %>',
             
             // Common
             loading: '<%= t("common:loading") %>',
@@ -748,22 +769,25 @@
             success: '<%= t("common:success") %>',
             
             // Completion
-            greatJob: '<%= t("test:great_job") || "Great job!" %>',
-            finishedTest: '<%= t("test:finished_test") || "You\'ve finished the test." %>',
-            detailedResults: '<%= t("test:detailed_results") || "View Detailed Results" %>',
+            greatJob: '<%= t("publicsurvey:great_job") || "Great job!" %>',
+            finishedpublicsurvey: '<%= t("publicsurvey:finished_publicsurvey") || "You\'ve finished the survey." %>',
+            detailedResults: '<%= t("publicsurvey:detailed_results") || "View Detailed Results" %>',
 
             // Subbmit
-            confirmSubmit: '<%= t("test:confirm_submit") %>',
-            confirmSubmitMessage: '<%= t("test:confirm_submit_message") %>',
+            confirmSubmit: '<%= t("publicsurvey:confirm_submit") %>',
+            confirmSubmitMessage: '<%= t("publicsurvey:confirm_submit_message") %>',
             submit: '<%= t("common:submit") %>',
             cancel: '<%= t("common:cancel") %>',
+            enterAnswer: '<%= t("publicsurvey:enter_answer") || "Enter your answer here..." %>',
+            yourAnswer: '<%= t("publicsurvey:your_answer") || "Your answer" %>',
+            noAnswers: '<%= t("publicsurvey:no_answers") || "Please answer at least one question before submitting." %>'
         };
     </script>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/js/quiz_preview.js"></script>
+    <!-- <script src="/js/quiz_preview.js"></script> -->
     
     <script>
         // Offline Quiz Logic with multilingual support
@@ -786,47 +810,9 @@
             // Set up test duration timer
             testTimeRemaining = (quizData.quiz.testDuration || 30) * 60; // Convert minutes to seconds
             startTestTimer();
-            // Initialize question navigation
-            initQuestionNav();
             // Start with first question
-            showQuestion(0);
+            showQuestion();
         });
-
-        function initQuestionNav() {
-            const nav = document.getElementById('questionNav');
-            nav.innerHTML = quizData.quiz.questions.map((q, index) => `
-                <div class="question-nav-item" 
-                     id="nav-q${index}" 
-                     onclick="showQuestion(${index})"
-                     data-question="${index + 1}">
-                    ${index + 1}
-                </div>
-            `).join('');
-            updateQuestionNav();
-        }
-
-        function updateQuestionNav() {
-            // Remove all special classes first
-            document.querySelectorAll('.question-nav-item').forEach(item => {
-                item.classList.remove('current', 'answered');
-            });
-
-            // Mark current question
-            const currentNav = document.getElementById(`nav-q${currentQuestionIndex}`);
-            if (currentNav) {
-                currentNav.classList.add('current');
-            }
-
-            // Mark answered questions
-            answers.forEach(answer => {
-                if (answer.selectedAnswer) {
-                    const navItem = document.getElementById(`nav-q${answer.questionNumber}`);
-                    if (navItem) {
-                        navItem.classList.add('answered');
-                    }
-                }
-            });
-        }
 
         function startTestTimer() {
             updateTestTimerDisplay();
@@ -842,13 +828,23 @@
         }
         async function completeTest() {
             if (isSubmitedTest) return; // Prevent multiple submissions
-            
+
+            if (answers.length === 0) {
+                Swal.fire({
+                    title: window.translations.error || 'Error',
+                    text: window.translations.noAnswers || 'Please answer at least one question before submitting.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             isSubmitedTest = true;
             clearInterval(testTimer);
 
             try {
                 // Submit test completion to server
-                const response = await fetch('/test/complete-offline-test', {
+                const response = await fetch('/publicsurvey/complete-public-survey', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -870,11 +866,6 @@
                 // Hide quiz content and show completion summary
                 document.getElementById('quizContent').style.display = 'none';
                 document.getElementById('completionSummary').style.display = 'block';
-                
-                // Update summary with server response data
-                document.getElementById('finalScore').textContent = result.results.participant.score;
-                document.getElementById('correctAnswers').textContent = result.results.participant.correctAnswers;
-                document.getElementById('totalTime').textContent = formatTime(Math.floor((Date.now() - startTime) / 1000));
                 
                 // Show completion message
                 Swal.fire({
@@ -914,8 +905,8 @@
 
         function confirmSubmitTest() {
             Swal.fire({
-                title: window.translations.confirmSubmit || 'Submit Test?',
-                text: window.translations.confirmSubmitMessage || 'Are you sure you want to submit your test? This action cannot be undone.',
+                title: window.translations.confirmSubmit || 'Submit Survey?',
+                text: window.translations.confirmSubmitMessage || 'Are you sure you want to submit your survey? This action cannot be undone.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
@@ -930,28 +921,19 @@
         }
 
         // Update existing functions
-        function showQuestion(questionIndex) {
-            // Remove timer-related code
-            currentQuestionIndex = questionIndex;
-            const question = quizData.quiz.questions[questionIndex];
-            displayQuestion(question);
-            updateQuestionNav();
-        }
-        function displayQuestion(question) {
+        function showQuestion() {
             const container = document.getElementById('previewQuestionContainer');
-            
-            // Find existing answer for this question
-            const existingAnswer = answers.find(a => a.questionNumber === currentQuestionIndex);
-            
-            let questionHTML = `
+            let displayQuestion = "";
+            quizData.quiz.questions.forEach((question,index) => {
+                let questionHTML = `<div>
                 <div class="question-display-container">
                     <div class="preview-question-header">
-                        <div class="preview-question-number">${currentQuestionIndex + 1}</div>
+                        <div class="preview-question-number">${index + 1}</div>
                         <div class="preview-question-content">
                             <h5 class="preview-question-title">${question.content}</h5>
                         </div>
                     </div>
-            `;
+                `;
             
             if (question.image) {
                 questionHTML += `
@@ -961,103 +943,56 @@
                 `;
             }
             
-            questionHTML += '<div class="preview-options">';
-            question.options.forEach(option => {
-                if (option.text && option.text.trim()) {
-                    const colorClass = `letter-${option.letter.toLowerCase()}`;
-                    const isSelected = existingAnswer && existingAnswer.selectedAnswer === option.letter;
-                    const selectedClasses = isSelected ? 'selected pulse-selection' : '';
-                    
-                    questionHTML += `
-                        <div class="preview-option ${selectedClasses}" 
-                            data-letter="${option.letter}" 
-                            onclick="selectAnswer('${option.letter}')">
-                            <div class="preview-option-content">
-                                <div class="preview-option-letter ${colorClass}">${option.letter}</div>
-                                <div class="preview-option-text">${option.text}</div>
-                                <div class="preview-option-status"></div>
-                            </div>
-                        </div>
-                    `;
-                }
+            questionHTML += `
+                <div class="answer-input-container mt-4">
+                    <div class="form-floating">
+                        <textarea 
+                            class="form-control answer-textarea" 
+                            id="answer-${index}"
+                            placeholder="${window.translations.enterAnswer || 'Enter your answer here...'}"
+                            style="height: 120px"
+                            onchange="handleAnswerChange(${index}, this.value)"
+                        ></textarea>
+                        <label for="answer-${index}">${window.translations.yourAnswer || 'Your answer'}</label>
+                    </div>
+                </div>
+            </div>`;
+            displayQuestion += questionHTML;
+        });
+
+        container.innerHTML = displayQuestion;
+    }
+    function handleAnswerChange(questionNumber, answerText) {
+        const existingAnswerIndex = answers.findIndex(a => a.questionNumber === questionNumber);
+        
+        if (existingAnswerIndex !== -1) {
+            // Nếu đã có câu trả lời, cập nhật nó
+            answers[existingAnswerIndex].answer = answerText;
+        } else {
+            // Nếu chưa có, thêm câu trả lời mới
+            answers.push({
+                questionNumber: questionNumber,
+                answer: answerText
             });
-            questionHTML += '</div></div>';
-            
-            container.innerHTML = questionHTML;
-            
-            // Apply option colors
-            setTimeout(() => {
-                if (typeof applyOptionColors === 'function') {
-                    applyOptionColors();
-                }
-            }, 100);
         }
-        function selectAnswer(letter) {
-            // if (hasSubmittedAnswer) return;
-            
-            // Remove classes from previously selected option if exists
-            const previousAnswer = answers.find(a => a.questionNumber === currentQuestionIndex);
-            if (previousAnswer) {
-                const previousOption = document.querySelector(`.preview-option[data-letter="${previousAnswer.selectedAnswer}"]`);
-                if (previousOption) {
-                    previousOption.classList.remove('selected', 'pulse-selection');
-                }
-            }
-            
-            // Add classes to newly selected option
-            const selectedOption = document.querySelector(`.preview-option[data-letter="${letter}"]`);
-            if (selectedOption) {
-                selectedOption.classList.add('selected', 'pulse-selection');
-            }
-            
-            selectedAnswer = letter;
-            // hasSubmittedAnswer = true;
-            
-            // Update answers array
-            const answerData = {
-                questionNumber: currentQuestionIndex,
-                selectedAnswer: letter,
-                correctAnswer: quizData.quiz.questions[currentQuestionIndex].correctAnswer,
-                isCorrect: letter === quizData.quiz.questions[currentQuestionIndex].correctAnswer,
-                points: letter === quizData.quiz.questions[currentQuestionIndex].correctAnswer ? 10 : 0
-            };
-
-            const existingAnswerIndex = answers.findIndex(a => a.questionNumber === currentQuestionIndex);
-            if (existingAnswerIndex >= 0) {
-                answers[existingAnswerIndex] = answerData;
-            } else {
-                answers.push(answerData);
-            }
-            
-            // Update UI
-            // showAnswerFeedback(letter, answerData.isCorrect);
-            updateQuestionNav();
-            // submitAnswerToServer(letter);
-        }
-
-        // Remove or comment out unused timer functions
-        // function startQuestionTimer() {...}
-        // function handleTimeUp() {...}
-        // function showAutoAdvanceNotice() {...}
+    }
     </script>
-
-    <!-- Thêm trước </body> -->
     <div class="quiz-sidebar">
         <div class="quiz-timer-large">
-            <div class="small mb-1"><%= t('test:time_remaining') %></div>
+            <div class="small mb-1"><%= t('publicsurvey:time_remaining') %></div>
             <div class="timer-text">
                 <span id="testTimerHours">00</span>:<span id="testTimerMinutes">00</span>:<span id="testTimerSeconds">00</span>
             </div>
         </div>
         
-        <h6 class="mb-3"><%= t('test:questions_list') %></h6>
+        <h6 class="mb-3"><%= t('publicsurvey:questions_list') %></h6>
         <div class="question-nav" id="questionNav">
             <!-- Questions nav will be populated by JavaScript -->
         </div>
 
         <button class="submit-test-btn" onclick="confirmSubmitTest()" style="background: linear-gradient(135deg, #64748b, #475569);">
             <i class="fas fa-paper-plane me-2"></i>
-            <%= t('test:submit_test') %>
+            <%= t('publicsurvey:submit_publicsurvey') %>
         </button>
     </div>
 </body>
