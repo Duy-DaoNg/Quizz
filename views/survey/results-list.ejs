@@ -281,6 +281,7 @@
 
         .test-icon.online { background: linear-gradient(135deg, var(--info-color), #1d4ed8); }
         .test-icon.offline { background: linear-gradient(135deg, var(--success-color), #059669); }
+        .test-icon.survey { background: linear-gradient(135deg, var(--warning-color), #e55208); }
 
         .test-details h6 {
             margin: 0 0 0.25rem 0;
@@ -387,6 +388,35 @@
             .test-info { flex-direction: column; text-align: center; }
             .results-table { font-size: 0.875rem; }
             .results-table tbody td { padding: 1rem 0.75rem; }
+        }
+        .action-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .action-icon {
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: white;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .action-icon.share {
+            background: linear-gradient(135deg, var(--info-color), #1d4ed8);
+        }
+
+        .action-icon.export {
+            background: linear-gradient(135deg, var(--success-color), #059669);
         }
     </style>
 </head>
@@ -545,19 +575,19 @@
                 <table class="table results-table">
                     <thead>
                         <tr>
-                            <th><%= t('publicsurvey:publicsurvey_information') %></th>
-                            <th><%= t('publicsurvey:mode') %></th>
+                            <th style="text-align: center;"><%= t('publicsurvey:publicsurvey_information') %></th>
                             <th style="text-align: center;"><%= t('publicsurvey:participants') %></th>
-                            <th><%= t('publicsurvey:completed_date') %></th>
+                            <th style="text-align: center;"><%= t('publicsurvey:created_date') %></th>
+                            <th style="text-align: center;"><%= t('publicsurvey:share_link') %></th>
+                            <th style="text-align: center;"><%= t('publicsurvey:export_excel') %></th>
                         </tr>
                     </thead>
-                    <!-- <i class="fas fa-file-excel"></i> -->
                     <tbody>
                         <% tests.forEach(test => { %>
-                        <tr onclick="viewTestResults('<%= test.testCode %>')" style="cursor: pointer;">
-                            <td>
+                        <tr>
+                            <td onclick="viewTestResults('<%= test.testCode %>')" style="cursor: pointer;">
                                 <div class="test-info">
-                                    <div class="test-icon <%= test.mode %>">
+                                    <div class="test-icon survey">
                                         <i class="fas fa-file-excel"></i>
                                     </div>
                                     <div class="test-details">
@@ -565,12 +595,6 @@
                                         <span class="test-code"><%= test.testCode %></span>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <span class="mode-badge <%= test.mode %>">
-                                    <i class="fas fa-file-excel"></i>
-                                    <%= t('test:' + test.mode) %>
-                                </span>
                             </td>
                             <td style="text-align: center;">
                                 <div class="participant-count"><%= formatNumber(test.participantCount) %></div>
@@ -584,6 +608,26 @@
                                     <small class="text-muted">
                                         <%= new Date(test.createdAt).toLocaleTimeString('en-GB', { hour12: false }) %>
                                     </small>
+                                </div>
+                            </td>
+                            <!-- <td style="text-align: center">
+                                <div class="test-icon survey" onclick="showShareModal('<%= test.testCode %>', '<%= test.quizTitle %>')">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <div class="test-icon survey" onclick="exportTestResults('<%= test.testCode %>', '<%= test.quizTitle %>')">
+                                    <i class="fas fa-file-excel"></i>
+                                </div>
+                            </td> -->
+                            <td class="action-cell">
+                                <div class="action-icon share" onclick="showShareModal('<%= test.testCode %>', '<%= test.quizTitle %>')">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                            </td>
+                            <td class="action-cell">
+                                <div class="action-icon export" onclick="exportTestResults('<%= test.testCode %>', '<%= test.quizTitle %>')">
+                                    <i class="fas fa-file-excel"></i>
                                 </div>
                             </td>
                         </tr>
@@ -672,6 +716,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Translation object for JavaScript -->
     <script>
         window.translations = {
@@ -684,11 +729,19 @@
             errorTitle: '<%= t("common:error") %>',
             errorSwitchDepartment: '<%= t("quiz:error_switch_department") %>',
             departmentStatistics: '<%= t("publicsurvey:department_statistics") %>',
-            viewingResults: '<%= t("publicsurvey:viewing_results") %>'
+            viewingResults: '<%= t("publicsurvey:viewing_results") %>',
+            shareLink: '<%= t("publicsurvey:share_link") %>',
+            exportExcel: '<%= t("publicsurvey:export_excel") %>',
+            copiedToClipboard: '<%= t("publicsurvey:copied_to_clipboard") %>',
+            accessViaSurveyCode: '<%= t("publicsurvey:access_via_survey_code") %>',
+            surveyLink: '<%= t("publicsurvey:survey_link") %>',
+            scanToJoin: '<%= t("publicsurvey:scan_to_join") %>',
+            surveyCode: '<%= t("publicsurvey:publicsurvey_code") %>'
         };
     </script>
     
     <script>
+        const resultsData = <%- JSON.stringify(tests) %>;
         function viewTestResults(testCode) {
             // Add loading animation
             const row = event.currentTarget;
@@ -743,6 +796,147 @@
             alert(window.translations.departmentStatistics + ' - Coming soon!');
         }
 
+        // Hàm hiển thị modal chia sẻ
+        function showShareModal(testCode, quizTitle) {
+            const testCreatedModal = new bootstrap.Modal(document.getElementById('testCreatedModal'));
+            const contentDiv = document.getElementById('testCreatedContent');
+            const joinLink = `${window.location.origin}/publicsurvey/join/${testCode}`;
+            
+            // Tìm data từ resultsData
+            const surveyData = resultsData.find(test => test.testCode === testCode);
+            
+            contentDiv.innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="badge bg-success fs-6 mb-3">
+                        ${window.translations.testCode}: <strong>${testCode}</strong>
+                    </div>
+                    <h6>${quizTitle}</h6>
+                </div>
+                
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="joinLinkInput" value="${joinLink}" readonly>
+                            <button class="btn btn-outline-primary" onclick="copyJoinLink()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-5 text-center">
+                        <img src="${surveyData.qrCode}" alt="QR Code" class="img-fluid" style="max-width: 150px;">
+                        <p class="text-muted small mt-2">${window.translations.scanToJoin}</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>${window.translations.accessViaSurveyCode}</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>${window.translations.surveyLink}: <strong>${testCode}</strong></li>
+                    </ul>
+                </div>
+            `;
+            
+            testCreatedModal.show();
+        }
+
+        // Hàm copy link
+        function copyJoinLink() {
+            const input = document.getElementById('joinLinkInput');
+            input.select();
+            document.execCommand('copy');
+            
+            const button = event.target.closest('button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check text-success"></i>';
+            
+            setTimeout(() => {
+                button.innerHTML = originalContent;
+            }, 2000);
+            
+            Swal.fire({
+                icon: 'success',
+                title: window.translations.copiedToClipboard,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        }
+
+        // Hàm xuất Excel
+        function exportTestResults(testCode, quizTitle) {
+            try {
+                // Tìm survey data từ resultsData
+                const surveyData = resultsData.find(test => test.testCode === testCode);
+                if (!surveyData) {
+                    throw new Error('Survey data not found');
+                }
+
+                // Tạo headers cho file Excel
+                const baseHeaders = [
+                    "<%= t('publicsurvey:publicsurvey_code') %>",
+                    "<%= t('publicsurvey:survey_title') %>",
+                    "<%= t('publicsurvey:participant_name') %>",
+                    "<%= t('publicsurvey:joined_date') %>",
+                    "<%= t('publicsurvey:completed_date') %>"
+                ];
+
+                // Thêm các cột cho từng câu hỏi
+                const maxQuestions = Math.max(
+                    surveyData.totalQuestions || 0,
+                    Math.max(...surveyData.participant.map(p => p.answers?.length || 0), 0)
+                );
+
+                // Tạo headers cho các câu hỏi
+                const questionHeaders = Array.from(
+                    { length: maxQuestions }, 
+                    (_, i) => `${"<%= t('publicsurvey:question') %>"} ${i + 1}`
+                );
+
+                const headers = [...baseHeaders, ...questionHeaders];
+
+                // Tạo dữ liệu từ participants
+                const rows = surveyData.participant.map(p => {
+                    // Dữ liệu cơ bản
+                    const baseData = [
+                        testCode,
+                        quizTitle,
+                        p.name,
+                        new Date(p.joinedAt).toLocaleString(),
+                        p.completedAt ? new Date(p.completedAt).toLocaleString() : ''
+                    ];
+
+                    // Thêm câu trả lời
+                    const answers = Array.from({ length: maxQuestions }, (_, i) => {
+                        const answer = p.answers[i];
+                        return answer ? answer.answer : '';
+                    });
+                    return [...baseData, ...answers];
+                });
+
+                // Tạo worksheet
+                const wsData = [headers, ...rows];
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+                // Tạo workbook và thêm worksheet
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Survey Results");
+
+                // Xuất file
+                XLSX.writeFile(wb, `survey_results_${testCode}_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+            } catch (error) {
+                console.error('Export error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: window.translations.errorTitle,
+                    text: error.message,
+                    confirmButtonColor: '#667eea'
+                });
+            }
+        }
+
         // Add loading states for better UX
         document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('.results-table tbody tr');
@@ -769,5 +963,25 @@
             });
         });
     </script>
+
+    <!-- Test Created/Share Modal -->
+<div class="modal fade" id="testCreatedModal" tabindex="-1" aria-labelledby="testCreatedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="testCreatedModalLabel">
+                    <i class="fas fa-share-alt me-2"></i><%= t('publicsurvey:share_survey') %>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="<%= t('common:close') %>"></button>
+            </div>
+            <div class="modal-body" id="testCreatedContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('common:close') %></button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

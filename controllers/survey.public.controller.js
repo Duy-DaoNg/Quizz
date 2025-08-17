@@ -487,7 +487,16 @@ class PublicSurveyController {
                 quizTitle: survey.quizId ? survey.quizId.title : 'Unknown Quiz',
                 createdAt: survey.createdAt,
                 participantCount: survey.participants ? survey.participants.length : 0,
-                totalParticipants: survey.participants ? survey.participants.length : 0
+                totalParticipants: survey.participants ? survey.participants.length : 0,
+                joinLink: survey.joinLink,
+                qrCode: survey.qrCode,
+                totalQuestions: survey.totalQuestions,
+                participant: survey.participants ? survey.participants.map(p => ({
+                    name: p.name,
+                    joinedAt: p.joinedAt,
+                    completedAt: p.completedAt,
+                    answers: p.answers,
+                })) : []
             }));
 
             // Statistics for header

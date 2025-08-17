@@ -136,6 +136,7 @@
   "offline_publicsurveys": "Khảo sát ngoại tuyến",
   "publicsurvey_information": "Thông tin khảo sát",
   "completed_date": "Ngày hoàn thành",
+  "created_date": "Ngày tạo",
   "no_publicsurvey_results_found": "Không tìm thấy kết quả khảo sát nào",
   "no_completed_publicsurveys_found": "Không tìm thấy khảo sát đã hoàn thành nào cho phòng ban này.",
   "no_completed_mode_publicsurveys_found": "Không tìm thấy khảo sát {{mode}} đã hoàn thành nào cho phòng ban này.",
@@ -183,5 +184,13 @@
   "confirm_submit_message": "Bạn có chắc chắn muốn nộp khảo sát không?",
   "enter_answer": "Nhập câu trả lời của bạn ở đây...",
   "your_answer": "Câu trả lời của bạn",
-  "no_answers": "Vui lòng trả lời ít nhất một câu hỏi trước khi nộp."
+  "no_answers": "Vui lòng trả lời ít nhất một câu hỏi trước khi nộp.",
+  "share_link": "Liên kết chia sẻ",
+  "export_excel": "Xuất sang Excel",
+  "copied_to_clipboard": "Đã sao chép vào clipboard",
+  "access_via_survey_code": "Truy cập qua mã khảo sát",
+  "survey_link": "Liên kết khảo sát",
+  "scan_to_join": "Quét để tham gia",
+  "share_survey": "Chia sẻ khảo sát",
+  "joined_date": "Ngày tham gia"
 }

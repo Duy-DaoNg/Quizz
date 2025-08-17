@@ -136,6 +136,7 @@
   "offline_publicsurveys": "Offline Surveys",
   "publicsurvey_information": "Survey Information",
   "completed_date": "Completed Date",
+  "created_date": "Created Date",
   "no_publicsurvey_results_found": "No Survey Results Found",
   "no_completed_publicsurveys_found": "No completed surveys found for this department.",
   "no_completed_mode_publicsurveys_found": "No completed {{mode}} surveys found for this department.",
@@ -184,5 +185,13 @@
   "confirm_submit_message": "Are you sure you want to submit the survey?",
   "enter_answer": "Enter your answer here...",
   "your_answer": "Your answer",
-  "no_answers": "Please answer at least one question before submitting."
+  "no_answers": "Please answer at least one question before submitting.",
+  "share_link": "Share Link",
+  "export_excel": "Export to Excel",
+  "copied_to_clipboard": "Copied to clipboard",
+  "access_via_survey_code": "Access via Survey Code",
+  "survey_link": "Survey Link",
+  "scan_to_join": "Scan to Join",
+  "share_survey": "Share Survey",
+  "joined_date": "Joined Date"
 }

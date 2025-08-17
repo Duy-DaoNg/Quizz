@@ -2,6 +2,7 @@ const Survey = require('../models/survey.model');
 const PublicSurvey = require('../models/survey.public.model');
 const QRCode = require('qrcode');
 const mongoose = require('mongoose');
+const e = require('express');
 
 class PublicSurveyService {
     /**
@@ -281,7 +282,11 @@ class PublicSurveyService {
                 .limit(limit)
                 .lean();
 
-            return publicSurveys;
+            return await Promise.all(publicSurveys.map(async e => ({
+                ...e,
+                joinLink: this.generateJoinLink(e.testCode),
+                qrCode: await this.generateQRCode(e.testCode)
+            })));
         } catch (error) {
             console.error('Error fetching public surveys list:', error);
             throw new Error('Failed to fetch public surveys list');
