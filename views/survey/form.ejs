@@ -67,10 +67,6 @@
                                 <i class="fas fa-arrow-left me-2"></i>
                                 <%= t('survey:back_to_dashboard') %>
                             </a>
-                            <button class="btn btn-primary-modern" onclick="previewSurvey()" data-bs-toggle="modal" data-bs-target="#previewModal">
-                                <i class="fas fa-eye me-2"></i>
-                                <%= t('survey:preview') %>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -183,12 +179,7 @@
                         <%= isEdit ? t('survey:review_changes_update') : t('survey:review_before_publish') %>
                     </p>
                     <div class="save-actions">
-                        <button type="button" class="btn btn-outline-light btn-lg px-4" 
-                                data-bs-toggle="modal" data-bs-target="#previewModal" 
-                                onclick="previewSurvey()">
-                            <i class="fas fa-eye me-2"></i><%= t('survey:preview_survey') %>
-                        </button>
-                        <button type="button" class="btn btn btn-success-modern" onclick="<%= isEdit ? 'updateSurvey()' : 'publishSurvey()' %>">
+                        <button type="button" class="btn btn btn-success-modern" onclick="<%= isEdit ? 'updateSurvey()' : 'publishSurvey()' %>" style="height: 50px; font-size: large; font-weight: 500;">
                             <i class="fas fa-<%= isEdit ? 'check-circle' : 'rocket' %> me-2"></i>
                             <%= isEdit ? t('survey:update_survey') : t('survey:publish_survey') %>
                         </button>
@@ -197,64 +188,6 @@
                 <div class="save-icon">
                     <i class="fas fa-<%= isEdit ? 'save' : 'magic' %>"></i>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Updated Preview Modal - Single Question Display -->
-<div class="modal fade preview-modal" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header border-0 pb-0">
-                <div class="w-100">
-                    <div class="quiz-info-preview">
-                        <div class="quiz-info-content">
-                            <h4 class="mb-3"><%= t('survey:survey') %>: <span id="previewTitle"></span></h4>
-                            <p class="mb-2"><i class="fas fa-globe me-1"></i><strong><%= t('survey:mode') %>:</strong> <span id="previewMode"></span></p>
-                            <p class="mb-2"><i class="fas fa-question-circle me-1"></i><strong><%= t('survey:questions') %>:</strong> <span id="previewQuestionProgress"></span></p>
-                        </div>
-                        <div class="quiz-timer-section">
-                            <div class="timer-display">
-                                <div class="timer-circle" id="timerCircle">
-                                    <span class="timer-text" id="timerText"><span id="timerMinutes">00</span>:<span id="timerSeconds">30</span></span>
-                                </div>
-                            </div>
-                            <p class="mb-0 mt-2"><%= t('survey:time_remaining') %></p>
-                        </div>
-                    </div>
-                    
-                    <!-- Progress Bar -->
-                    <div class="progress mt-3" style="height: 20px;">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                            role="progressbar" style="width: 0%" 
-                            id="previewProgress" aria-valuenow="0" aria-valuemin="0" 
-                            aria-valuemax="100"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-body">
-                <!-- Question Display -->
-                <div id="previewQuestionContainer">
-                    <!-- Single question will be displayed here -->
-                </div>
-                
-                <!-- Navigation -->
-                <div class="preview-navigation text-center mt-4">
-                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display: none;">
-                        <%= t('survey:next') %><i class="fas fa-arrow-right ms-1"></i>
-                    </button>
-                    <button class="btn btn-success" id="finishBtn" onclick="finishSurvey()" style="display: none;">
-                        <i class="fas fa-flag-checkered me-1"></i><%= t('survey:finish_survey') %>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i><%= t('survey:close_preview') %>
-                </button>
             </div>
         </div>
     </div>
@@ -305,13 +238,6 @@ window.translations = {
     bottom: '<%= t("survey:bottom") %>',
     up: '<%= t("survey:up") %>',
     down: '<%= t("survey:down") %>',
-    
-    // Preview messages
-    noQuestions: '<%= t("survey:no_questions_preview") %>',
-    previewComplete: '<%= t("survey:preview_complete") %>',
-    reviewedAllQuestions: '<%= t("survey:reviewed_all_questions") %>',
-    restartPreview: '<%= t("survey:restart_preview") %>',
-    exitPreview: '<%= t("survey:exit_preview") %>',
     
     // Save messages
     publishSurvey: '<%= t("survey:publish_survey") %>',

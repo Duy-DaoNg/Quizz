@@ -765,13 +765,6 @@ function editSurvey() {
     if (modal) modal.hide();
 }
 
-// Clean up when modal is hidden
-document.getElementById('previewModal').addEventListener('hidden.bs.modal', function() {
-    stopTimer();
-    currentPreviewQuestion = 0;
-    selectedAnswer = null;
-});
-
 // =================== SUBMIT FUNCTIONS ===================
 
 function publishSurvey() {
