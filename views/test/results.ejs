@@ -535,7 +535,7 @@
                             <div class="participant-info">
                                 <div class="participant-name"><%= participant.name %></div>
                                 <div class="participant-stats">
-                                    <%= participant.correctAnswers %>/<%= participant.totalQuestions %> <%= t('test:correct') %> • 
+                                    <%= participant.correctAnswers %>/<%= results.totalQuestions %> <%= t('test:correct') %> • 
                                     <%= Math.round(participant.completionTime / 60) %> <%= t('test:min') %>
                                 </div>
                             </div>
@@ -648,7 +648,7 @@
             const perfCtx = document.getElementById('performanceChart').getContext('2d');
             const correctAnswers = resultsData.results.map(r => r.correctAnswers);
             const averageCorrect = correctAnswers.reduce((sum, val) => sum + val, 0) / correctAnswers.length;
-            const totalQuestions = resultsData.results[0]?.totalQuestions || 0;
+            const totalQuestions = resultsData.totalQuestions || 0;
 
             new Chart(perfCtx, {
                 type: 'doughnut',
@@ -689,7 +689,7 @@
                 participant.name,
                 participant.score,
                 participant.correctAnswers,
-                participant.totalQuestions,
+                resultsData.totalQuestions,
                 Math.round(participant.completionTime / 60)
             ])
         ];
