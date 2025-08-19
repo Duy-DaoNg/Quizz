@@ -538,7 +538,9 @@ class TestService {
                     score: participant.score,
                     correctAnswers: participant.answers.filter(a => a.isCorrect).length,
                     totalQuestions: participant.answers.length,
-                    completionTime: Math.round((participant.completedAt - participant.joinedAt) / 1000),
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                        : participant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                     finalRank: rank
                 },
                 testCompleted: test.status === 'completed',
@@ -630,7 +632,9 @@ class TestService {
                     score: completedParticipant.score,
                     correctAnswers: completedParticipant.answers.filter(a => a.isCorrect).length,
                     totalQuestions: completedParticipant.answers.length,
-                    completionTime: Math.round((completedParticipant.completedAt - completedParticipant.joinedAt) / 1000),
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((completedParticipant.completedAt - completedParticipant.joinedAt) / 1000)
+                        : completedParticipant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                     finalRank: rankingUpdate.newParticipantRank
                 },
                 completionProgress: completionProgress,
@@ -731,7 +735,9 @@ class TestService {
                     score: finalScore,
                     correctAnswers: correctAnswers,
                     totalQuestions: quiz.questions.length,
-                    completionTime: Math.round((completedParticipant.completedAt - completedParticipant.joinedAt) / 1000),
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((completedParticipant.completedAt - completedParticipant.joinedAt) / 1000)
+                        : completedParticipant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                     finalRank: rankingUpdate.newParticipantRank
                 },
                 completionProgress: completionProgress,
@@ -772,7 +778,9 @@ class TestService {
                 score: participant.score,
                 correctAnswers: participant.answers.filter(a => a.isCorrect).length,
                 totalQuestions: participant.answers.length,
-                completionTime: Math.round((participant.completedAt - participant.joinedAt) / 1000),
+                completionTime: test.mode === 'offline' 
+                    ? Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                    : participant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                 completedAt: participant.completedAt
             };
             
@@ -881,7 +889,9 @@ class TestService {
                     score: participant.score,
                     correctAnswers: participant.answers.filter(a => a.isCorrect).length,
                     totalQuestions: participant.answers.length,
-                    completionTime: Math.round((participant.completedAt - participant.joinedAt) / 1000),
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                        : participant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                     completedAt: participant.completedAt // Keep completion timestamp
                 }));
             
@@ -936,7 +946,9 @@ class TestService {
                     score: participant.score,
                     correctAnswers: participant.answers.filter(a => a.isCorrect).length,
                     totalQuestions: participant.answers.length,
-                    completionTime: Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                        : participant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                 }));
             
             // Update test with final results
@@ -1051,7 +1063,9 @@ class TestService {
                     totalAnswers: participant.answers.length,
                     status: 'completed',
                     completedAt: participant.completedAt,
-                    completionTime: Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                        : participant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                 }));
             
             // Add in-progress participants (sorted by current score)
@@ -1367,7 +1381,9 @@ class TestService {
                     score: participant.score,
                     correctAnswers: participant.answers.filter(a => a.isCorrect).length,
                     totalQuestions: participant.answers.length,
-                    completionTime: Math.round((new Date() - participant.joinedAt) / 1000)
+                    completionTime: test.mode === 'offline' 
+                        ? Math.round((participant.completedAt - participant.joinedAt) / 1000)
+                        : participant.answers.reduce((total, answer) => total + (answer.answerTime || 0), 0),
                 }));
             
             // Atomic update
