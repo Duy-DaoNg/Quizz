@@ -1625,7 +1625,7 @@ class TestService {
                     mode: updatedTest.mode,
                     status: updatedTest.status,
                     completedAt: updatedTest.updatedAt,
-                    participantCount: updatedTest.getActiveParticipants().length,
+                    participantCount: updatedTest.finalResults.length,
                     results: updatedTest.finalResults || []
                 };
             }
