@@ -1656,7 +1656,7 @@ class TestService {
                 mode: test.mode,
                 status: test.status,
                 completedAt: test.updatedAt,
-                participantCount: updatedTest.finalResults.length,
+                participantCount: test.finalResults.length,
                 results: test.finalResults
             };
         } catch (error) {
