@@ -158,6 +158,7 @@
   "export_csv": "Xuất XLSX",
   "number_of_participants": "Số lượng người tham gia",
   "completion_time_min": "Thời gian hoàn thành (phút)",
+  "completion_time_sec": "Thời gian hoàn thành (giây)",
   "moving_to_next": "Đang tự động chuyển sang câu hỏi tiếp theo...",
   "test_completed_desc": "Làm tốt lắm! Bạn đã hoàn thành bài test.",
   "final_score": "Điểm cuối cùng",

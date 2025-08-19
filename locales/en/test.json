@@ -158,6 +158,7 @@
   "export_csv": "Export XLSX",
   "number_of_participants": "Number of Participants",
   "completion_time_min": "Completion Time (minutes)",
+  "completion_time_sec": "Completion Time (seconds)",
 
   "moving_to_next": "Moving to next question automatically...",
   "test_completed_desc": "Great job! You've finished the test.",
