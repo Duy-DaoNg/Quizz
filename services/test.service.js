@@ -1640,7 +1640,7 @@ class TestService {
                 mode: test.mode,
                 status: test.status,
                 completedAt: test.updatedAt,
-                participantCount: test.getActiveParticipants().length,
+                participantCount: updatedTest.finalResults.length,
                 results: test.finalResults
             };
         } catch (error) {
