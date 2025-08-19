@@ -1,5 +1,6 @@
 // services/auth.service.js
 const User = require('../models/user.model');
+const Room = require('../models/room.model');
 
 class AuthService {
     async login(email, password, remember = false, t = null) {
@@ -53,82 +54,23 @@ class AuthService {
                     translationKey: 'auth:account_deactivated'
                 };
             }
-            
-            // Fallback to hardcoded credentials for development
-            const validCredentials = [
-                { email: 'admin@quizapp.com', password: 'admin123', name: 'Admin User', role: 'admin' },
-                { email: 'admin1@quizapp.com', password: 'admin123', name: 'Admin User 1', role: 'admin' },
-                { email: 'admin2@quizapp.com', password: 'admin123', name: 'Admin User 2', role: 'admin' }
-            ];
-            
-            const hardcodedUser = validCredentials.find(
-                cred => cred.email.toLowerCase() === email.toLowerCase() && cred.password === password
-            );
-            
-            if (hardcodedUser) {
-                // Create user in database if doesn't exist
-                try {
-                    let dbUser = await User.findByEmail(hardcodedUser.email);
-                    if (!dbUser) {
-                        const result = await User.createUser({
-                            name: hardcodedUser.name,
-                            email: hardcodedUser.email,
-                            password: hardcodedUser.password,
-                            role: hardcodedUser.role
-                        });
-                        
-                        if (result.success) {
-                            dbUser = result.user;
-                        } else {
-                            console.error('Error creating user in DB:', result.message);
-                            // Return hardcoded user data if DB creation fails
-                            return {
-                                success: true,
-                                user: {
-                                    id: Date.now(),
-                                    user_id: Date.now(),
-                                    name: hardcodedUser.name,
-                                    email: hardcodedUser.email,
-                                    role: hardcodedUser.role,
-                                    loginTime: new Date(),
-                                    rememberMe: remember
-                                }
-                            };
-                        }
+
+            let dbUser = await User.findByEmail(email);
+            if (dbUser && dbUser.password === password) {
+                // User exists in DB and password matches
+                return {
+                    success: true,
+                    user: {
+                        id: dbUser._id,
+                        user_id: dbUser.user_id,
+                        name: dbUser.name,
+                        email: dbUser.email,
+                        role: dbUser.role,
+                        loginTime: new Date(),
+                        rememberMe: remember
                     }
-                    
-                    await dbUser.updateLastLogin();
-                    
-                    return {
-                        success: true,
-                        user: {
-                            id: dbUser._id,
-                            user_id: dbUser.user_id,
-                            name: dbUser.name,
-                            email: dbUser.email,
-                            role: dbUser.role,
-                            loginTime: new Date(),
-                            rememberMe: remember
-                        }
-                    };
-                } catch (dbError) {
-                    console.error('Database user creation error:', dbError);
-                    // Return hardcoded user data even if DB save fails
-                    return {
-                        success: true,
-                        user: {
-                            id: Date.now(),
-                            user_id: Date.now(),
-                            name: hardcodedUser.name,
-                            email: hardcodedUser.email,
-                            role: hardcodedUser.role,
-                            loginTime: new Date(),
-                            rememberMe: remember
-                        }
-                    };
-                }
+                };
             }
-            
             return {
                 success: false,
                 message: translate('auth:invalid_credentials'),
@@ -355,26 +297,58 @@ class AuthService {
                 return message;
             });
 
-            // Room passwords
-            const ROOM_PASSWORDS = {
-                'hrm': '123456',
-                'hse': '123456',
-                'gm': '123456',
-                'qaqs': '123456',
-                'sm': '123456',
-                'fol': '123456',
-                'eol': '123456',
-                'it': '123456',
-                'mkt': '123456',
-                'eng': '123456',
-                'wh': '123456',
-                'log': '123456',
-                'pnp': '123456',
-                'acc': '123456'
+            const room = await Room.findByCode(roomCode);
+            if (!room) {
+                return {
+                    success: false,
+                    message: translate('auth:invalid_room_code'),
+                    translationKey: 'auth:invalid_room_code'
+                };
+            }
+
+            const isValidPassword = await Room.validatePassword(roomCode, password);
+            if (!isValidPassword) {
+                return {
+                    success: false,
+                    message: translate('auth:invalid_room_password'),
+                    translationKey: 'auth:invalid_room_password'
+                };
+            }
+
+            return {
+                success: true,
+                roomCode,
+                roomName: room.name,
+                message: translate('auth:room_access_granted', { roomName: room.name }),
+                translationKey: 'auth:room_access_granted'
             };
 
-
-            // Room names
+        } catch (error) {
+            console.error('Room validation error:', error);
+            const translate = t || ((key) => key);
+            return {
+                success: false,
+                message: translate('auth:room_validation_failed'),
+                translationKey: 'auth:room_validation_failed',
+                error: error.message
+            };
+        }
+    }
+    async createInitialRooms(t = null) {
+        try {
+            const translate = t || ((key, options = {}) => {
+                const messages = {
+                    'auth:room_created': 'Room created: {{code}} - {{name}}',
+                    'auth:rooms_setup_complete': 'Rooms setup completed',
+                    'auth:rooms_setup_failed': 'Failed to setup rooms'
+                };
+                let message = messages[key] || key;
+                Object.keys(options).forEach(placeholder => {
+                    message = message.replace(`{{${placeholder}}}`, options[placeholder]);
+                });
+                return message;
+            });
+    
             const ROOM_NAMES = {
                 'hrm': 'Human Resource Management',
                 'hse': 'Health, Safety & Environment',
@@ -391,38 +365,38 @@ class AuthService {
                 'pnp': 'Procurement - Planning',
                 'acc': 'Accounting'
             };
-
-            if (!ROOM_PASSWORDS.hasOwnProperty(roomCode)) {
-                return {
-                    success: false,
-                    message: translate('auth:invalid_room_code'),
-                    translationKey: 'auth:invalid_room_code'
-                };
+    
+            let createdCount = 0;
+            for (const [code, name] of Object.entries(ROOM_NAMES)) {
+                const existingRoom = await Room.findByCode(code);
+                if (!existingRoom) {
+                    const room = new Room({
+                        code: code,
+                        name: name,
+                        password: '123456',
+                        isActive: true
+                    });
+                    
+                    await room.save();
+                    console.log(`✅ ${translate('auth:room_created', { code, name })}`);
+                    createdCount++;
+                }
             }
-
-            if (ROOM_PASSWORDS[roomCode] !== password) {
-                return {
-                    success: false,
-                    message: translate('auth:invalid_room_password'),
-                    translationKey: 'auth:invalid_room_password'
-                };
-            }
-
+    
             return {
                 success: true,
-                roomCode,
-                roomName: ROOM_NAMES[roomCode],
-                message: translate('auth:room_access_granted', { roomName: ROOM_NAMES[roomCode] }),
-                translationKey: 'auth:room_access_granted'
+                createdCount,
+                message: translate('auth:rooms_setup_complete'),
+                translationKey: 'auth:rooms_setup_complete'
             };
-
+    
         } catch (error) {
-            console.error('Room validation error:', error);
+            console.error('Error creating rooms:', error);
             const translate = t || ((key) => key);
             return {
                 success: false,
-                message: translate('auth:room_validation_failed'),
-                translationKey: 'auth:room_validation_failed',
+                message: translate('auth:rooms_setup_failed'),
+                translationKey: 'auth:rooms_setup_failed',
                 error: error.message
             };
         }

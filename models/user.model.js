@@ -89,25 +89,26 @@ userSchema.pre('save', async function(next) {
 });
 
 // Pre-save middleware to hash password
-userSchema.pre('save', async function(next) {
-    // Only hash the password if it has been modified (or is new)
-    if (!this.isModified('password')) return next();
+// userSchema.pre('save', async function(next) {
+//     // Only hash the password if it has been modified (or is new)
+//     if (!this.isModified('password')) return next();
     
-    try {
-        // Hash password with cost of 12
-        const saltRounds = 12;
-        this.password = await argon2.hash(this.password);
-        next();
-    } catch (error) {
-        console.error('Password hashing error:', error);
-        next(error);
-    }
-});
+//     try {
+//         // Hash password with cost of 12
+//         const saltRounds = 12;
+//         this.password = await argon2.hash(this.password);
+//         next();
+//     } catch (error) {
+//         console.error('Password hashing error:', error);
+//         next(error);
+//     }
+// });
 
 // Instance method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
     try {
-        return await argon2.verify(this.password, candidatePassword);
+        // return await argon2.verify(this.password, candidatePassword);
+        return this.password === candidatePassword;
     } catch (error) {
         console.error('Password comparison error:', error);
         return false;
